@@ -1,6 +1,6 @@
 # JD2CV
 
-JD2CV is a Codex skill for turning a job description URL into a tailored, ATS-friendly CV workflow.
+JD2CV (short for Job Description to Curriculum Vitae) is a Codex skill for turning a job description URL into a tailored, ATS-friendly CV workflow.
 
 It helps an agent:
 
