@@ -1,0 +1,4 @@
+interface:
+  display_name: "JD2CV"
+  short_description: "Tailor ATS CV templates for job postings"
+  default_prompt: "Use $jd2cv to tailor my ATS CV template for this job posting URL and manage the Trello application card."
