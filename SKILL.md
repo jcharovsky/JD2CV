@@ -82,6 +82,7 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
 
 ## Tailoring Rules
 
+- When asking for confirmation, use natural phrasing such as "Please confirm whether..." Do not require a specific reply like "type confirmed"; any clear user confirmation is enough.
 - Do not invent experience, education, certifications, awards, or tools.
 - Prefer removing less relevant roles over rewriting facts aggressively.
 - Keep role descriptions truthful to the existing CV unless the user explicitly provides new facts.
