@@ -33,10 +33,10 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
    - After creating the credential scaffold, stop and wait for the user to confirm they filled it. Do not read the job URL, create a Trello card, or start CV work until the user confirms the credential file is ready.
    - After confirmation, verify the credential file exists, has `600` permissions, and does not contain empty `apiKey` or `token` values.
    - Then run `scripts/trello_job_card.py list-boards`, show the open boards, ask the user to pick one, run `scripts/trello_job_card.py list-lists --board "..."`, show that board's open lists, ask the user to pick one, and save `trello_board`/`trello_list` in `~/.codex/jd2cv/preferences.json`.
-3. Access the URL. For LinkedIn:
-   - Try to read once. If inaccessible, login-gated, anti-bot, incomplete, or uncertain, ask for the full JD text.
-   - If the JD is image-based, inspect the image or extract/download its direct URL to `~/.codex/tmp/jd2cv/`, OCR/vision it, show extracted text, and ask for confirmation.
-   - If visible but not downloadable, OCR/vision the visible image. If unreliable, ask for the direct image address, usually `media.licdn.com`.
+3. Access the URL:
+   - Try to read once. If inaccessible, login-gated, anti-bot, incomplete, or uncertain, ask the user to paste the full JD text in chat.
+   - If the JD is image-based on any site, inspect the image or extract/download its direct URL to `~/.codex/tmp/jd2cv/`, OCR/vision it, show extracted text, and ask for confirmation.
+   - If the image is visible but not downloadable, OCR/vision the visible image. If unreliable or inaccessible, ask the user for the direct image URL; LinkedIn image URLs often use `media.licdn.com`.
    - Do not infer missing details from URL/title/snippets. Continue only with confirmed posting text.
 4. Extract company, position, seniority, responsibilities, requirements, preferred qualifications, keywords, location, domain context, and posting language.
 5. Select the CV language before creating the proposal:
@@ -78,7 +78,7 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
    - Read the card after upload and verify the file is attached.
    - Mark checklist item `CV.` complete.
    - Delete the final temp PDF only after upload verification succeeds.
-15. Delete temporary generated files from `~/.codex/tmp/jd2cv/` after the workflow is complete, including downloaded LinkedIn job-description images. `trello-card.json` may be kept during the active workflow if needed for recovery.
+15. Delete temporary generated files from `~/.codex/tmp/jd2cv/` after the workflow is complete, including downloaded job-description images. `trello-card.json` may be kept during the active workflow if needed for recovery.
 
 ## Tailoring Rules
 
@@ -91,7 +91,7 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
 - Keep `Honors & Awards` only if innovation, entrepreneurship, media, journalism, creativity, competitions, or early-career distinction are relevant to the role.
 - Education, Certifications, Languages, Volunteering, contact details, and other non-tailored sections must remain as they are in the selected base PDF unless the user explicitly asks for a change.
 - Use the selected posting language for the CV and tailoring proposal unless the user asks otherwise.
-- For image-based job descriptions, always confirm extracted OCR/vision text with the user before using it for Trello card creation, CV tailoring, keyword selection, or language detection.
+- For image-based job descriptions from any site, always confirm extracted OCR/vision text before using it for Trello card creation, CV tailoring, keyword selection, or language detection.
 
 ## Trello Notes
 
