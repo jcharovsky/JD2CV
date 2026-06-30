@@ -39,9 +39,13 @@ def load_auth(config_path: Path):
     check_config_permissions(config_path)
     data = json.loads(config_path.read_text())
     try:
-        return data["apiKey"], data["token"]
+        key = data["apiKey"].strip()
+        token = data["token"].strip()
     except KeyError as exc:
         raise RuntimeError(f"Trello config is missing required key: {exc.args[0]}") from exc
+    if not key or not token:
+        raise RuntimeError("Trello config has empty apiKey or token. Fill ~/.config/jd2cv/trello.json locally before continuing.")
+    return key, token
 
 
 def request(method, path, key, token, params=None, data=None, headers=None):

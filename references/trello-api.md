@@ -71,6 +71,8 @@ nano ~/.config/jd2cv/trello.json
 
 The helper refuses to use the file if group or other users have permissions on it.
 
+After creating the scaffold, stop and wait for the user to confirm they filled it. Do not read the job URL or start CV work until confirmed. After confirmation, verify the file exists, has `600` permissions, and has non-empty `apiKey` and `token` values.
+
 ## Card Creation
 
 Use saved board/list:
