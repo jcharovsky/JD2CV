@@ -7,7 +7,7 @@ description: Use when the user provides a job posting URL and wants to analyze t
 
 ## Purpose
 
-Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with optional Trello card tracking through JD2CV's custom Python Trello API helper. Always preserve the template's simple, single-column, text-based PDF format.
+Tailor an ATS-safe CV template for an English or Spanish job URL, with optional Trello tracking through JD2CV's Python API helper. Preserve the simple, single-column, text-based PDF format.
 
 ## Assets
 
@@ -24,31 +24,18 @@ Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with
 ## Required Workflow
 
 1. Receive a job posting URL.
-2. Before reading the URL or discussing CV tailoring, resolve the optional Trello integration preference and setup:
-   - If the user explicitly says to use or not use Trello in the current request, follow that instruction and update `~/.codex/jd2cv/preferences.json`.
-   - Otherwise, read `~/.codex/jd2cv/preferences.json` if it exists.
-   - If no Trello preference exists, ask once whether the user wants to use Trello integration for JD2CV.
-   - Store only non-secret preference data, for example `{"trello_enabled": true, "trello_board": "Job Applications", "trello_list": "Doing"}` or `{"trello_enabled": false}`.
-   - If Trello is disabled, continue local-only and skip all Trello steps.
-   - If Trello is enabled, immediately ask whether the user already has: a Trello account, a target board, and a Trello API key/token pair.
-   - If any answer is no, read `references/trello-api.md` and provide the needed setup instructions before doing any URL/CV work.
-   - After the user confirms they have an account, board, key, and token, ask for the board name and list/column name where cards should be created, then save them in `~/.codex/jd2cv/preferences.json`.
-   - Explain secure auth setup from `references/trello-api.md`. Create `~/.config/jd2cv/trello.json` with empty `apiKey` and `token` fields, set it to `chmod 600`, and instruct the user to fill those values locally in their editor. Never ask the user to paste Trello credentials into chat, and never print Trello credential file contents after the user fills it.
-3. Access the URL, handling LinkedIn postings conservatively:
-   - If the URL is a LinkedIn URL, try to open/read it once.
-   - If the LinkedIn page is inaccessible, requires login, shows anti-bot/interstitial content, omits the job description, or cannot be confidently extracted, stop and ask the user to paste the full job description text in chat.
-   - If the accessible LinkedIn page contains the job description only or partly as an image, first try to inspect the image directly or extract its direct image URL from the page.
-   - If a direct image URL is available, download it to `~/.codex/tmp/jd2cv/`, extract the visible text using available vision/OCR capabilities, show the extracted job description text to the user, and ask for confirmation or corrections before continuing.
-   - If the image is visible but cannot be downloaded, use available vision/OCR directly on the visible image and ask the user to confirm the extracted text.
-   - If the LinkedIn page or image cannot be accessed reliably, ask the user to right-click the image and provide the direct image address, usually from `media.licdn.com`.
-   - Do not ask the user to manually download and re-upload LinkedIn images unless direct image URL download and direct visual inspection both fail.
-   - Do not infer missing LinkedIn job details from the URL, title, or partial snippets.
-   - Continue only after the posting content is available from the URL or from user-pasted text.
-4. Read the posting and extract:
-   - company name
-   - position name
-   - seniority, responsibilities, requirements, preferred qualifications, keywords, location, and domain context
-   - posting language: English or Spanish
+2. Before reading the URL or discussing CV tailoring, resolve Trello:
+   - If the request explicitly enables/disables Trello, follow it and update `~/.codex/jd2cv/preferences.json`.
+   - Otherwise read that file; if absent, ask once whether to use Trello.
+   - Save only non-secrets, e.g. `{"trello_enabled": true, "trello_board": "Job Applications", "trello_list": "Doing"}` or `{"trello_enabled": false}`.
+   - If disabled, skip Trello. If enabled, ask immediately whether the user has a Trello account, target board, and API key/token. If not, read `references/trello-api.md` and guide setup before URL/CV work.
+   - Once confirmed, ask board and list/column names, save them, create `~/.config/jd2cv/trello.json` scaffold with empty `apiKey`/`token`, run `chmod 600`, and tell the user to fill it locally. Never request or print credentials.
+3. Access the URL. For LinkedIn:
+   - Try to read once. If inaccessible, login-gated, anti-bot, incomplete, or uncertain, ask for the full JD text.
+   - If the JD is image-based, inspect the image or extract/download its direct URL to `~/.codex/tmp/jd2cv/`, OCR/vision it, show extracted text, and ask for confirmation.
+   - If visible but not downloadable, OCR/vision the visible image. If unreliable, ask for the direct image address, usually `media.licdn.com`.
+   - Do not infer missing details from URL/title/snippets. Continue only with confirmed posting text.
+4. Extract company, position, seniority, responsibilities, requirements, preferred qualifications, keywords, location, domain context, and posting language.
 5. Select the CV language before creating the proposal:
    - Use `assets/en/` when the posting is primarily in English.
    - Use `assets/es/` when the posting is primarily in Spanish.
@@ -61,10 +48,10 @@ Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with
    - Description: `[Job posting](provided URL)`
 7. Prepare a tailoring proposal before editing the CV. Include:
    - replacement Professional Summary / Perfil Profesional for the template summary placeholder
-   - for `Experience` / `Experiencia`: items to keep and items to remove
-   - for `Skills` / `Habilidades`: skills to keep and skills to remove from the template skills list
+   - `Experience` / `Experiencia`: keep/remove
+   - `Skills` / `Habilidades`: keep/remove from template skills
    - any additional skills not in the template only when the job clearly requires them
-   - for `Honors & Awards` / `Honores y Premios`: items to keep and items to remove
+   - `Honors & Awards` / `Honores y Premios`: keep/remove
    - state that all other sections remain unchanged from the selected base PDF
    - short justification for every decision
 8. If the user already provided some tailoring decisions with the URL, evaluate them:
@@ -78,8 +65,8 @@ Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with
 12. Validate the final PDF. Read `references/ats-rules.md` and verify:
    - PDF text extracts correctly
    - section order and tailored content are present
-   - no tables, sidebars, images, icons, text boxes, or multi-column layout were introduced
-   - output remains a text-based ATS-safe PDF
+   - no tables, sidebars, images, icons, text boxes, or multi-column layout
+   - output is text-based and ATS-safe
 13. Ask for final confirmation:
    - If the user requests changes, apply them and return to validation.
    - If the user confirms the final document is OK and Trello is enabled, proceed to upload.
@@ -104,10 +91,7 @@ Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with
 
 ## Trello Notes
 
-- Trello is optional. If the user declines Trello, complete the CV workflow locally.
-- Ask about Trello only when no saved preference exists or when the user explicitly asks to change it.
-- Save the Trello preference at `~/.codex/jd2cv/preferences.json`; do not save it inside the skill folder or repository.
-- The Trello helper is a custom Python script that uses the Trello REST API directly.
-- It reads credentials only from `~/.config/jd2cv/trello.json`; create the empty scaffold for the user, protect it with `chmod 600`, and have the user fill credentials locally outside chat.
-- Never print the Trello API key or token.
+- Trello is optional; ask only when no saved preference exists or the user asks to change it.
+- Save non-secret preferences in `~/.codex/jd2cv/preferences.json`, never in the repo/skill.
+- The helper calls Trello REST API and reads credentials only from `~/.config/jd2cv/trello.json`; scaffold it, `chmod 600`, have user fill it locally, and never print/request key or token.
 - If Trello card creation succeeds, preserve the generated card state path in the working notes for later upload.
