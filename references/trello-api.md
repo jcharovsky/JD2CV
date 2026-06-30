@@ -10,7 +10,7 @@ Check:
 ~/.codex/jd2cv/preferences.json
 ```
 
-If it exists, use it unless the user asks to change it. If absent, ask once. If enabled, ask board and list/column, then save non-secrets:
+If it exists and includes board/list, use it unless the user asks to change it. If absent, ask once. If enabled, save `trello_enabled` first, then discover board/list after credentials work:
 
 ```json
 {
@@ -33,10 +33,9 @@ If disabled:
 If Trello is enabled, immediately ask whether they have:
 
 - a Trello account
-- a target Trello board
 - a Trello API key and token pair
 
-If account/board is missing, tell them to create it in Trello UI. If key/token is missing:
+If account is missing, tell them to create it in Trello UI. If key/token is missing:
 
 1. Open the Trello API key page while logged into Trello:
    `https://trello.com/power-ups/admin`
@@ -72,6 +71,30 @@ nano ~/.config/jd2cv/trello.json
 The helper refuses to use the file if group or other users have permissions on it.
 
 After creating the scaffold, stop and wait for the user to confirm they filled it. Do not read the job URL or start CV work until confirmed. After confirmation, verify the file exists, has `600` permissions, and has non-empty `apiKey` and `token` values.
+
+## Board/List Selection
+
+After credential verification, list open boards:
+
+```bash
+python scripts/trello_job_card.py list-boards
+```
+
+Show the board names to the user and ask them to pick one. Then list that board's open lists:
+
+```bash
+python scripts/trello_job_card.py list-lists --board "Job Applications"
+```
+
+Show the list names and ask the user to pick one. Save:
+
+```json
+{
+  "trello_enabled": true,
+  "trello_board": "chosen board",
+  "trello_list": "chosen list"
+}
+```
 
 ## Card Creation
 

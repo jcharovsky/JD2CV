@@ -28,10 +28,11 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
    - If the request explicitly enables/disables Trello, follow it and update `~/.codex/jd2cv/preferences.json`.
    - Otherwise read that file; if absent, ask once whether to use Trello.
    - Save only non-secrets, e.g. `{"trello_enabled": true, "trello_board": "Job Applications", "trello_list": "Doing"}` or `{"trello_enabled": false}`.
-   - If disabled, skip Trello. If enabled, ask immediately whether the user has a Trello account, target board, and API key/token. If not, read `references/trello-api.md` and guide setup before URL/CV work.
-   - Once confirmed, ask board and list/column names, save them, create `~/.config/jd2cv/trello.json` scaffold with empty `apiKey`/`token`, run `chmod 600`, and tell the user to fill it locally. Never request or print credentials.
+   - If disabled, skip Trello. If enabled, ask immediately whether the user has a Trello account and API key/token. If not, read `references/trello-api.md` and guide setup before URL/CV work.
+   - Create `~/.config/jd2cv/trello.json` scaffold with empty `apiKey`/`token`, run `chmod 600`, and tell the user to fill it locally. Never request or print credentials.
    - After creating the credential scaffold, stop and wait for the user to confirm they filled it. Do not read the job URL, create a Trello card, or start CV work until the user confirms the credential file is ready.
-   - After confirmation, verify the credential file exists, has `600` permissions, and does not contain empty `apiKey` or `token` values before continuing.
+   - After confirmation, verify the credential file exists, has `600` permissions, and does not contain empty `apiKey` or `token` values.
+   - Then run `scripts/trello_job_card.py list-boards`, show the open boards, ask the user to pick one, run `scripts/trello_job_card.py list-lists --board "..."`, show that board's open lists, ask the user to pick one, and save `trello_board`/`trello_list` in `~/.codex/jd2cv/preferences.json`.
 3. Access the URL. For LinkedIn:
    - Try to read once. If inaccessible, login-gated, anti-bot, incomplete, or uncertain, ask for the full JD text.
    - If the JD is image-based, inspect the image or extract/download its direct URL to `~/.codex/tmp/jd2cv/`, OCR/vision it, show extracted text, and ask for confirmation.

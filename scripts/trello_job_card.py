@@ -110,6 +110,20 @@ def find_named(items, name, kind):
     return matches[0]
 
 
+def list_boards(args):
+    key, token = load_auth(args.config)
+    boards = request("GET", "/members/me/boards", key, token, {"fields": "name,url", "filter": "open"})
+    print(json.dumps([{"name": board.get("name"), "id": board.get("id"), "url": board.get("url")} for board in boards], indent=2))
+
+
+def list_lists(args):
+    key, token = load_auth(args.config)
+    boards = request("GET", "/members/me/boards", key, token, {"fields": "name", "filter": "open"})
+    board = find_named(boards, args.board, "board")
+    lists = request("GET", f"/boards/{board['id']}/lists", key, token, {"fields": "name", "filter": "open"})
+    print(json.dumps([{"name": item.get("name"), "id": item.get("id")} for item in lists], indent=2))
+
+
 def create_card(args):
     key, token = load_auth(args.config)
     boards = request("GET", "/members/me/boards", key, token, {"fields": "name", "filter": "open"})
@@ -192,6 +206,13 @@ def main():
     parser = argparse.ArgumentParser(description="Create Trello job cards and upload CV PDFs.")
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     sub = parser.add_subparsers(dest="cmd", required=True)
+
+    boards = sub.add_parser("list-boards")
+    boards.set_defaults(func=list_boards)
+
+    lists = sub.add_parser("list-lists")
+    lists.add_argument("--board", required=True)
+    lists.set_defaults(func=list_lists)
 
     create = sub.add_parser("create-card")
     create.add_argument("--job-url", required=True)
