@@ -5,11 +5,11 @@ JD2CV (short for Job Description to Curriculum Vitae) is a Codex skill for turni
 It helps an agent:
 
 - Read a job posting URL and extract company, position, requirements, responsibilities, keywords, and posting language.
-- Create a Trello application card for the opportunity.
+- Optionally create a Trello application card for the opportunity through JD2CV's custom Trello API helper.
 - Select the English or Spanish ATS CV template.
 - Propose CV tailoring decisions before editing.
 - Generate review PDFs and a final text-based, single-column ATS PDF.
-- Upload the final PDF to the Trello card, verify the attachment, mark the CV checklist item complete, and clean up temporary files.
+- Optionally upload the final PDF to the Trello card, verify the attachment, and mark the CV checklist item complete.
 
 ## Included Files
 
@@ -21,19 +21,33 @@ It helps an agent:
 - `assets/es/ATS_CV_Template_es.pdf`: Rendered Spanish sample PDF.
 - `assets/es/generate_ats_cv_es.py`: Spanish Markdown-to-PDF generator.
 - `scripts/render_cv.sh`: Helper that creates a local virtual environment, installs ReportLab if needed, and renders a PDF.
-- `scripts/trello_job_card.py`: Trello card creation and CV upload helper.
+- `scripts/trello_job_card.py`: Optional Trello card/checklist/upload helper that uses the Trello REST API.
 - `references/ats-rules.md`: ATS validation rules.
-- `references/trello-api.md`: Trello helper usage notes.
+- `references/trello-api.md`: Trello API helper usage notes.
 
 ## Requirements
 
 - Codex with local skills support.
 - Python 3 with `venv`.
 - `pip`, used by `scripts/render_cv.sh` to install `reportlab` in a temporary virtual environment.
-- Network access when installing `reportlab` or calling Trello.
-- Trello API credentials at `~/.trello-cli/default/config.json` for Trello card creation and upload.
+- Network access when installing `reportlab` or using Trello.
+- Trello API key/token only if using the optional Trello integration.
 
-The Trello config file must contain:
+No Trello setup is required for local-only CV generation.
+
+No extra Python package is required for the Trello helper; it uses the Python standard library.
+
+## Optional Trello Integration
+
+JD2CV's Trello integration is optional. The skill asks whether to use Trello before reading the job URL or starting CV work.
+
+The helper reads credentials from a user-created config file:
+
+```text
+~/.config/jd2cv/trello.json
+```
+
+The file must contain:
 
 ```json
 {
@@ -42,25 +56,35 @@ The Trello config file must contain:
 }
 ```
 
-No extra Python package is required for the Trello helper; it uses the Python standard library.
-
-## Trello Defaults
-
-The Trello helper defaults to:
-
-- Board: `Job Applications`
-- List: `Doing`
-- Checklist: `General`
-- Checklist items: `CV.`, `Application.`, `Interview.`, `Contract.`
-
-Override the board and list with environment variables:
+Create and protect it manually:
 
 ```bash
-export JD2CV_TRELLO_BOARD="Your Board"
-export JD2CV_TRELLO_LIST="Your List"
+mkdir -p ~/.config/jd2cv
+nano ~/.config/jd2cv/trello.json
+chmod 600 ~/.config/jd2cv/trello.json
 ```
 
-You can also pass `--board` and `--list` directly to `scripts/trello_job_card.py create-card`.
+Do not paste Trello credentials into chat. The helper refuses to use the credential file if group or other users can read it.
+
+When Trello is enabled, JD2CV creates the card, creates a checklist, uploads the final PDF, verifies the attachment, and marks `CV.` complete.
+
+JD2CV stores the user's Trello preference outside the repo at:
+
+```text
+~/.codex/jd2cv/preferences.json
+```
+
+The skill asks whether to use Trello only when this preference is missing, or when the user explicitly asks to change it. The file stores only non-secret preference data, such as:
+
+```json
+{
+  "trello_enabled": true,
+  "trello_board": "Job Applications",
+  "trello_list": "Doing"
+}
+```
+
+Delete or edit that file to reset the preference.
 
 ## Rendering the Sample PDFs
 

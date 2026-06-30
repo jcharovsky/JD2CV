@@ -1,44 +1,116 @@
-# Trello Workflow
+# Trello API Workflow
 
-Use `scripts/trello_job_card.py` for card creation and final CV upload.
+Trello is optional. Resolve the user's Trello preference before reading the job URL or starting CV tailoring.
 
-Credentials:
+JD2CV uses its own Python helper, `scripts/trello_job_card.py`, to call the Trello REST API. It must not use third-party Trello tools.
 
-- The script reads Trello credentials from `~/.trello-cli/default/config.json`.
-- Do not print, quote, or expose the API key or token.
+## Preference
 
-Card creation:
-
-```bash
-python ~/.codex/skills/jd2cv/scripts/trello_job_card.py create-card \
-  --job-url "https://example.com/job" \
-  --company "Company" \
-  --position "Position"
-```
-
-Defaults:
-
-- Board: `Job Applications`, or `JD2CV_TRELLO_BOARD` when set
-- List: `Doing`, or `JD2CV_TRELLO_LIST` when set
-- Card position: bottom
-- Description: `[Job posting](URL)`
-- Checklist: `General`
-- Checklist items, initially unchecked:
-  - `CV.`
-  - `Application.`
-  - `Interview.`
-  - `Contract.`
-
-The script writes card state to:
+Before asking the user about Trello, check:
 
 ```text
-~/.codex/tmp/jd2cv/trello-card.json
+~/.codex/jd2cv/preferences.json
 ```
 
-Final upload:
+If the file exists, use its values unless the user explicitly asks to change them. If it does not exist, ask once whether to use Trello integration.
+
+If the user enables Trello, ask for the board name and list/column name where application cards should be created, then save non-secret preferences:
+
+```json
+{
+  "trello_enabled": true,
+  "trello_board": "Job Applications",
+  "trello_list": "Doing"
+}
+```
+
+If the user disables Trello, save:
+
+```json
+{
+  "trello_enabled": false
+}
+```
+
+## Account And API Setup
+
+If the user chooses Trello, immediately ask whether they already have:
+
+- a Trello account
+- a target Trello board
+- a Trello API key and token pair
+
+If they do not have a Trello account or board, instruct them to create those in Trello's web UI before continuing.
+
+If they do not have an API key/token pair:
+
+1. Open the Trello API key page while logged into Trello:
+   `https://trello.com/power-ups/admin`
+2. Create or select a Power-Up/admin entry and copy the API key shown there.
+3. Generate an API token for that key using Trello's token authorization flow.
+4. Keep both values private. Do not paste them into chat.
+
+Official references:
+
+- Trello REST API introduction: `https://developer.atlassian.com/cloud/trello/guides/rest-api/api-introduction/`
+- Trello authorization guide: `https://developer.atlassian.com/cloud/trello/guides/rest-api/authorization/`
+
+## Secure Local Credentials
+
+Tell the user to create the credentials file themselves in a terminal or editor. Do not create it for them, do not ask them to paste credentials into chat, and do not print the file contents.
+
+Path:
+
+```text
+~/.config/jd2cv/trello.json
+```
+
+Expected contents:
+
+```json
+{
+  "apiKey": "your-trello-api-key",
+  "token": "your-trello-token"
+}
+```
+
+Recommended setup:
 
 ```bash
-python ~/.codex/skills/jd2cv/scripts/trello_job_card.py upload-cv \
+mkdir -p ~/.config/jd2cv
+nano ~/.config/jd2cv/trello.json
+chmod 600 ~/.config/jd2cv/trello.json
+```
+
+The helper refuses to use the file if group or other users have permissions on it.
+
+## Card Creation
+
+Use the board/list names saved in `~/.codex/jd2cv/preferences.json`:
+
+```bash
+python scripts/trello_job_card.py create-card \
+  --job-url "https://example.com/job" \
+  --company "Company" \
+  --position "Position" \
+  --board "Job Applications" \
+  --list "Doing"
+```
+
+The command:
+
+1. Finds the open Trello board by name.
+2. Finds the open list by name.
+3. Creates a card named `[COMPANY NAME] - [POSITION NAME]`.
+4. Adds description `[Job posting](URL)`.
+5. Creates checklist `General`.
+6. Adds unchecked checklist items: `CV.`, `Application.`, `Interview.`, `Contract.`
+7. Writes card state to `~/.codex/tmp/jd2cv/trello-card.json`.
+
+## Final Upload
+
+```bash
+python scripts/trello_job_card.py upload-cv \
   --file "$HOME/.codex/tmp/jd2cv/ATS_CV_Template.pdf" \
   --delete
 ```

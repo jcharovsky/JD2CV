@@ -4,6 +4,7 @@ import json
 import mimetypes
 import os
 import ssl
+import stat
 import sys
 import urllib.error
 import urllib.parse
@@ -13,16 +14,34 @@ from pathlib import Path
 
 
 API = "https://api.trello.com/1"
-DEFAULT_CONFIG = Path.home() / ".trello-cli" / "default" / "config.json"
-DEFAULT_BOARD = os.environ.get("JD2CV_TRELLO_BOARD", "Job Applications")
-DEFAULT_LIST = os.environ.get("JD2CV_TRELLO_LIST", "Doing")
+DEFAULT_CONFIG = Path.home() / ".config" / "jd2cv" / "trello.json"
+DEFAULT_WORKDIR = Path.home() / ".codex" / "tmp" / "jd2cv"
 DEFAULT_CHECKLIST = "General"
 DEFAULT_ITEMS = ["CV.", "Application.", "Interview.", "Contract."]
 
 
+def check_config_permissions(config_path: Path):
+    mode = stat.S_IMODE(config_path.stat().st_mode)
+    if mode & (stat.S_IRWXG | stat.S_IRWXO):
+        raise RuntimeError(
+            f"Trello config file is too permissive: {config_path}. "
+            f"Run `chmod 600 {config_path}` before using it."
+        )
+
+
 def load_auth(config_path: Path):
+    if not config_path.exists():
+        raise RuntimeError(
+            f"Trello config file not found: {config_path}. "
+            "Create it manually and protect it with chmod 600. "
+            "Never paste Trello credentials into chat."
+        )
+    check_config_permissions(config_path)
     data = json.loads(config_path.read_text())
-    return data["apiKey"], data["token"]
+    try:
+        return data["apiKey"], data["token"]
+    except KeyError as exc:
+        raise RuntimeError(f"Trello config is missing required key: {exc.args[0]}") from exc
 
 
 def request(method, path, key, token, params=None, data=None, headers=None):
@@ -45,7 +64,7 @@ def request(method, path, key, token, params=None, data=None, headers=None):
 
 
 def multipart_upload(path, fields, file_field, file_path, key, token):
-    boundary = f"----cvcreator-{uuid.uuid4().hex}"
+    boundary = f"----jd2cv-{uuid.uuid4().hex}"
     chunks = []
     for name, value in fields.items():
         chunks.append(f"--{boundary}\r\n".encode())
@@ -105,13 +124,7 @@ def create_card(args):
             "pos": "bottom",
         },
     )
-    checklist = request(
-        "POST",
-        f"/cards/{card['id']}/checklists",
-        key,
-        token,
-        data={"name": DEFAULT_CHECKLIST},
-    )
+    checklist = request("POST", f"/cards/{card['id']}/checklists", key, token, data={"name": DEFAULT_CHECKLIST})
     check_items = []
     for item_name in DEFAULT_ITEMS:
         item = request(
@@ -156,13 +169,7 @@ def upload_cv(args):
     cv_item = next((item for item in state["check_items"] if item.get("name") == "CV."), None)
     if not cv_item:
         raise RuntimeError("Could not find checklist item named 'CV.' in saved card state")
-    request(
-        "PUT",
-        f"/cards/{card_id}/checkItem/{cv_item['id']}",
-        key,
-        token,
-        data={"state": "complete"},
-    )
+    request("PUT", f"/cards/{card_id}/checkItem/{cv_item['id']}", key, token, data={"state": "complete"})
     card = request(
         "GET",
         f"/cards/{card_id}",
@@ -186,13 +193,13 @@ def main():
     create.add_argument("--job-url", required=True)
     create.add_argument("--company", required=True)
     create.add_argument("--position", required=True)
-    create.add_argument("--board", default=DEFAULT_BOARD)
-    create.add_argument("--list", default=DEFAULT_LIST)
-    create.add_argument("--workdir", type=Path, default=Path.home() / ".codex" / "tmp" / "jd2cv")
+    create.add_argument("--board", required=True)
+    create.add_argument("--list", required=True)
+    create.add_argument("--workdir", type=Path, default=DEFAULT_WORKDIR)
     create.set_defaults(func=create_card)
 
     upload = sub.add_parser("upload-cv")
-    upload.add_argument("--state", type=Path, default=Path.home() / ".codex" / "tmp" / "jd2cv" / "trello-card.json")
+    upload.add_argument("--state", type=Path, default=DEFAULT_WORKDIR / "trello-card.json")
     upload.add_argument("--file", type=Path, required=True)
     upload.add_argument("--delete", action="store_true")
     upload.set_defaults(func=upload_cv)
