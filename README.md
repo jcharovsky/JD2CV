@@ -5,6 +5,7 @@ JD2CV (short for Job Description to Curriculum Vitae) is a Codex skill for turni
 It helps an agent:
 
 - Read a job posting URL and extract company, position, requirements, responsibilities, keywords, and posting language.
+- Handle LinkedIn job URLs by asking for pasted job-description text when the page cannot be reliably read.
 - Optionally create a Trello application card for the opportunity through JD2CV's custom Trello API helper.
 - Select the English or Spanish ATS CV template.
 - Propose CV tailoring decisions before editing.

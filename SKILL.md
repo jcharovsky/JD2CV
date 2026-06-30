@@ -34,22 +34,27 @@ Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with
    - If any answer is no, read `references/trello-api.md` and provide the needed setup instructions before doing any URL/CV work.
    - After the user confirms they have an account, board, key, and token, ask for the board name and list/column name where cards should be created, then save them in `~/.codex/jd2cv/preferences.json`.
    - Explain secure auth setup from `references/trello-api.md`. The user must create `~/.config/jd2cv/trello.json` themselves and run `chmod 600` on it. Never ask the user to paste Trello credentials into chat, and never print Trello credential file contents.
-3. Access the URL, read the posting, and extract:
+3. Access the URL, handling LinkedIn postings conservatively:
+   - If the URL is a LinkedIn URL, try to open/read it once.
+   - If the LinkedIn page is inaccessible, requires login, shows anti-bot/interstitial content, omits the job description, or cannot be confidently extracted, stop and ask the user to paste the full job description text in chat.
+   - Do not infer missing LinkedIn job details from the URL, title, or partial snippets.
+   - Continue only after the posting content is available from the URL or from user-pasted text.
+4. Read the posting and extract:
    - company name
    - position name
    - seniority, responsibilities, requirements, preferred qualifications, keywords, location, and domain context
    - posting language: English or Spanish
-4. Select the CV language before creating the proposal:
+5. Select the CV language before creating the proposal:
    - Use `assets/en/` when the posting is primarily in English.
    - Use `assets/es/` when the posting is primarily in Spanish.
    - If the posting mixes languages, choose the language used for the main job description unless the user asks otherwise.
    - The tailoring proposal, generated CV content, and final PDF should use the selected language.
-5. If Trello is enabled, create the Trello card before CV creation using `scripts/trello_job_card.py create-card`.
+6. If Trello is enabled, create the Trello card before CV creation using `scripts/trello_job_card.py create-card`.
    - Board: value from `~/.codex/jd2cv/preferences.json`
    - List: value from `~/.codex/jd2cv/preferences.json`
    - Card name: `[COMPANY NAME] - [POSITION NAME]`
    - Description: `[Job posting](provided URL)`
-6. Prepare a tailoring proposal before editing the CV. Include:
+7. Prepare a tailoring proposal before editing the CV. Include:
    - replacement Professional Summary / Perfil Profesional for the template summary placeholder
    - for `Experience` / `Experiencia`: items to keep and items to remove
    - for `Skills` / `Habilidades`: skills to keep and skills to remove from the template skills list
@@ -57,28 +62,28 @@ Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with
    - for `Honors & Awards` / `Honores y Premios`: items to keep and items to remove
    - state that all other sections remain unchanged from the selected base PDF
    - short justification for every decision
-7. If the user already provided some tailoring decisions with the URL, evaluate them:
+8. If the user already provided some tailoring decisions with the URL, evaluate them:
    - implement them if they fit the job posting and ATS strategy
    - correct them if needed, explaining why
-8. Wait for confirmation before applying tailoring edits.
-9. Copy the selected language source/generator into `~/.codex/tmp/jd2cv/work/`, edit only the temp copies, and generate review PDFs directly under `~/.codex/tmp/jd2cv/` until the user approves. Use `scripts/render_cv.sh` to render PDFs; it creates a temp venv under `~/.codex/tmp/jd2cv/venv` if needed.
-10. After confirmation, create the final PDF exactly at:
+9. Wait for confirmation before applying tailoring edits.
+10. Copy the selected language source/generator into `~/.codex/tmp/jd2cv/work/`, edit only the temp copies, and generate review PDFs directly under `~/.codex/tmp/jd2cv/` until the user approves. Use `scripts/render_cv.sh` to render PDFs; it creates a temp venv under `~/.codex/tmp/jd2cv/venv` if needed.
+11. After confirmation, create the final PDF exactly at:
    - `~/.codex/tmp/jd2cv/ATS_CV_Template.pdf`, unless the user requests a different candidate-specific filename
    - Never create a generated CV on Desktop.
-11. Validate the final PDF. Read `references/ats-rules.md` and verify:
+12. Validate the final PDF. Read `references/ats-rules.md` and verify:
    - PDF text extracts correctly
    - section order and tailored content are present
    - no tables, sidebars, images, icons, text boxes, or multi-column layout were introduced
    - output remains a text-based ATS-safe PDF
-12. Ask for final confirmation:
+13. Ask for final confirmation:
    - If the user requests changes, apply them and return to validation.
    - If the user confirms the final document is OK and Trello is enabled, proceed to upload.
-13. If Trello is enabled, read `references/trello-api.md` and use `scripts/trello_job_card.py upload-cv --delete`.
+14. If Trello is enabled, read `references/trello-api.md` and use `scripts/trello_job_card.py upload-cv --delete`.
    - Upload the final PDF from `~/.codex/tmp/jd2cv/` to the Trello card created earlier.
    - Read the card after upload and verify the file is attached.
    - Mark checklist item `CV.` complete.
    - Delete the final temp PDF only after upload verification succeeds.
-14. Delete temporary generated files from `~/.codex/tmp/jd2cv/` after the workflow is complete, except `trello-card.json` may be kept during the active workflow if needed for recovery.
+15. Delete temporary generated files from `~/.codex/tmp/jd2cv/` after the workflow is complete, except `trello-card.json` may be kept during the active workflow if needed for recovery.
 
 ## Tailoring Rules
 
