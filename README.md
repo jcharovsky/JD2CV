@@ -5,7 +5,8 @@ JD2CV (short for Job Description to Curriculum Vitae) is a Codex skill for turni
 It helps an agent:
 
 - Read a job posting URL and extract company, position, requirements, responsibilities, keywords, and posting language.
-- Handle LinkedIn job URLs by asking for pasted job-description text when the page cannot be reliably read, or by downloading direct LinkedIn image URLs when the JD is posted as an image.
+- Handle inaccessible job URLs by asking for pasted job-description text when the page cannot be reliably read.
+- Handle LinkedIn job posts and image-based JDs by using accessible page images, direct `media.licdn.com` image URLs, or confirmed OCR/vision text.
 - Optionally create a Trello application card for the opportunity through JD2CV's custom Trello API helper.
 - Select the English or Spanish ATS CV template.
 - Propose CV tailoring decisions before editing.
@@ -38,15 +39,19 @@ No Trello setup is required for local-only CV generation.
 
 No extra Python package is required for the Trello helper; it uses the Python standard library.
 
-## LinkedIn Image Posts
+## Job URL And Image Handling
 
-When a LinkedIn job post contains the JD in an image, JD2CV first tries to inspect the image directly or extract/download its direct image URL. If that is not possible, provide the direct image address instead of downloading the image manually. In LinkedIn this is usually available from the browser's image context menu and often points to `media.licdn.com`.
+JD2CV tries to read the provided job URL directly. If the page is inaccessible, login-gated, blocked, incomplete, or unreliable, the skill asks the user to paste the full job description text before tailoring.
 
-JD2CV downloads the image to `~/.codex/tmp/jd2cv/`, extracts the visible text with available vision/OCR capabilities, asks the user to confirm or correct the extracted text, and deletes the downloaded image after the workflow is complete.
+For LinkedIn posts, the skill tries the page once. If the JD is in an image, it first tries to inspect the image or extract/download the direct image URL itself. If that fails, the user can provide the image address, often from `media.licdn.com`.
+
+Downloaded JD images go to `~/.codex/tmp/jd2cv/`. JD2CV extracts visible text with available vision/OCR, asks the user to confirm or correct the extracted text, and deletes downloaded images after the workflow.
 
 ## Optional Trello Integration
 
 JD2CV's Trello integration is optional. The skill asks whether to use Trello before reading the job URL or starting CV work.
+
+If Trello is enabled, the skill first handles credentials, then uses the Trello API to list the user's open boards and asks the user to choose one. It then lists the open lists in that board and asks the user to choose the destination list. The selected board/list are saved as non-secret preferences.
 
 The helper reads credentials from a local config file:
 
@@ -74,8 +79,6 @@ nano ~/.config/jd2cv/trello.json
 
 Do not paste Trello credentials into chat. The helper refuses to use the credential file if group or other users can read it.
 
-When Trello is enabled, JD2CV creates the card, creates a checklist, uploads the final PDF, verifies the attachment, and marks `CV.` complete.
-
 JD2CV stores the user's Trello preference outside the repo at:
 
 ```text
@@ -93,6 +96,8 @@ The skill asks whether to use Trello only when this preference is missing, or wh
 ```
 
 Delete or edit that file to reset the preference.
+
+When Trello is enabled, JD2CV creates the card in the selected list, adds checklist `General`, adds `CV.`, `Application.`, `Interview.`, and `Contract.`, uploads the final PDF, verifies the attachment, and marks `CV.` complete.
 
 ## Rendering the Sample PDFs
 
