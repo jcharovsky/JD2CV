@@ -37,6 +37,9 @@ Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with
 3. Access the URL, handling LinkedIn postings conservatively:
    - If the URL is a LinkedIn URL, try to open/read it once.
    - If the LinkedIn page is inaccessible, requires login, shows anti-bot/interstitial content, omits the job description, or cannot be confidently extracted, stop and ask the user to paste the full job description text in chat.
+   - If the job description appears in a LinkedIn image, ask the user to right-click the image and provide the direct image address, usually from `media.licdn.com`.
+   - If the user provides a direct LinkedIn image URL, download it to `~/.codex/tmp/jd2cv/`, extract the visible text using available vision/OCR capabilities, show the extracted job description text to the user, and ask for confirmation or corrections before continuing.
+   - Do not ask the user to manually download and re-upload LinkedIn images unless the direct image URL cannot be downloaded or read.
    - Do not infer missing LinkedIn job details from the URL, title, or partial snippets.
    - Continue only after the posting content is available from the URL or from user-pasted text.
 4. Read the posting and extract:
@@ -83,7 +86,7 @@ Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with
    - Read the card after upload and verify the file is attached.
    - Mark checklist item `CV.` complete.
    - Delete the final temp PDF only after upload verification succeeds.
-15. Delete temporary generated files from `~/.codex/tmp/jd2cv/` after the workflow is complete, except `trello-card.json` may be kept during the active workflow if needed for recovery.
+15. Delete temporary generated files from `~/.codex/tmp/jd2cv/` after the workflow is complete, including downloaded LinkedIn job-description images. `trello-card.json` may be kept during the active workflow if needed for recovery.
 
 ## Tailoring Rules
 
@@ -95,6 +98,7 @@ Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with
 - Keep `Honors & Awards` only if innovation, entrepreneurship, media, journalism, creativity, competitions, or early-career distinction are relevant to the role.
 - Education, Certifications, Languages, Volunteering, contact details, and other non-tailored sections must remain as they are in the selected base PDF unless the user explicitly asks for a change.
 - Use the selected posting language for the CV and tailoring proposal unless the user asks otherwise.
+- For image-based job descriptions, always confirm extracted OCR/vision text with the user before using it for Trello card creation, CV tailoring, keyword selection, or language detection.
 
 ## Trello Notes
 

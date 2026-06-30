@@ -5,7 +5,7 @@ JD2CV (short for Job Description to Curriculum Vitae) is a Codex skill for turni
 It helps an agent:
 
 - Read a job posting URL and extract company, position, requirements, responsibilities, keywords, and posting language.
-- Handle LinkedIn job URLs by asking for pasted job-description text when the page cannot be reliably read.
+- Handle LinkedIn job URLs by asking for pasted job-description text when the page cannot be reliably read, or by downloading direct LinkedIn image URLs when the JD is posted as an image.
 - Optionally create a Trello application card for the opportunity through JD2CV's custom Trello API helper.
 - Select the English or Spanish ATS CV template.
 - Propose CV tailoring decisions before editing.
@@ -37,6 +37,12 @@ It helps an agent:
 No Trello setup is required for local-only CV generation.
 
 No extra Python package is required for the Trello helper; it uses the Python standard library.
+
+## LinkedIn Image Posts
+
+When a LinkedIn job post cannot be read but the JD is visible in an image, provide the direct image address instead of downloading the image manually. In LinkedIn this is usually available from the browser's image context menu and often points to `media.licdn.com`.
+
+JD2CV downloads the image to `~/.codex/tmp/jd2cv/`, extracts the visible text with available vision/OCR capabilities, asks the user to confirm or correct the extracted text, and deletes the downloaded image after the workflow is complete.
 
 ## Optional Trello Integration
 
