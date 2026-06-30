@@ -93,6 +93,10 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
 - Use the selected posting language for the CV and tailoring proposal unless the user asks otherwise.
 - For image-based job descriptions from any site, always confirm extracted OCR/vision text before using it for Trello card creation, CV tailoring, keyword selection, or language detection.
 
+## Maintenance Notes
+
+- Whenever the base Markdown files are updated and the base PDFs are recreated from them, remind the user to upload the new Markdown versions to Google Drive.
+
 ## Trello Notes
 
 - Trello is optional; ask only when no saved preference exists or the user asks to change it.
