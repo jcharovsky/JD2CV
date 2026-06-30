@@ -33,7 +33,7 @@ Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with
    - If Trello is enabled, immediately ask whether the user already has: a Trello account, a target board, and a Trello API key/token pair.
    - If any answer is no, read `references/trello-api.md` and provide the needed setup instructions before doing any URL/CV work.
    - After the user confirms they have an account, board, key, and token, ask for the board name and list/column name where cards should be created, then save them in `~/.codex/jd2cv/preferences.json`.
-   - Explain secure auth setup from `references/trello-api.md`. The user must create `~/.config/jd2cv/trello.json` themselves and run `chmod 600` on it. Never ask the user to paste Trello credentials into chat, and never print Trello credential file contents.
+   - Explain secure auth setup from `references/trello-api.md`. Create `~/.config/jd2cv/trello.json` with empty `apiKey` and `token` fields, set it to `chmod 600`, and instruct the user to fill those values locally in their editor. Never ask the user to paste Trello credentials into chat, and never print Trello credential file contents after the user fills it.
 3. Access the URL, handling LinkedIn postings conservatively:
    - If the URL is a LinkedIn URL, try to open/read it once.
    - If the LinkedIn page is inaccessible, requires login, shows anti-bot/interstitial content, omits the job description, or cannot be confidently extracted, stop and ask the user to paste the full job description text in chat.
@@ -108,6 +108,6 @@ Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with
 - Ask about Trello only when no saved preference exists or when the user explicitly asks to change it.
 - Save the Trello preference at `~/.codex/jd2cv/preferences.json`; do not save it inside the skill folder or repository.
 - The Trello helper is a custom Python script that uses the Trello REST API directly.
-- It reads credentials only from `~/.config/jd2cv/trello.json`, which the user must create outside chat and protect with `chmod 600`.
+- It reads credentials only from `~/.config/jd2cv/trello.json`; create the empty scaffold for the user, protect it with `chmod 600`, and have the user fill credentials locally outside chat.
 - Never print the Trello API key or token.
 - If Trello card creation succeeds, preserve the generated card state path in the working notes for later upload.

@@ -48,27 +48,28 @@ JD2CV downloads the image to `~/.codex/tmp/jd2cv/`, extracts the visible text wi
 
 JD2CV's Trello integration is optional. The skill asks whether to use Trello before reading the job URL or starting CV work.
 
-The helper reads credentials from a user-created config file:
+The helper reads credentials from a local config file:
 
 ```text
 ~/.config/jd2cv/trello.json
 ```
 
-The file must contain:
+The skill creates this scaffold:
 
 ```json
 {
-  "apiKey": "your-trello-api-key",
-  "token": "your-trello-token"
+  "apiKey": "",
+  "token": ""
 }
 ```
 
-Create and protect it manually:
+Then the user fills it locally, outside the chat, and keeps it protected:
 
 ```bash
 mkdir -p ~/.config/jd2cv
-nano ~/.config/jd2cv/trello.json
+printf '{\n  "apiKey": "",\n  "token": ""\n}\n' > ~/.config/jd2cv/trello.json
 chmod 600 ~/.config/jd2cv/trello.json
+nano ~/.config/jd2cv/trello.json
 ```
 
 Do not paste Trello credentials into chat. The helper refuses to use the credential file if group or other users can read it.

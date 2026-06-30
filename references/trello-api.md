@@ -57,7 +57,7 @@ Official references:
 
 ## Secure Local Credentials
 
-Tell the user to create the credentials file themselves in a terminal or editor. Do not create it for them, do not ask them to paste credentials into chat, and do not print the file contents.
+Create the credentials file scaffold for the user, then tell the user to fill the values themselves in a terminal editor. Do not ask them to paste credentials into chat, and do not print the file contents after they fill it.
 
 Path:
 
@@ -65,12 +65,12 @@ Path:
 ~/.config/jd2cv/trello.json
 ```
 
-Expected contents:
+Scaffold contents:
 
 ```json
 {
-  "apiKey": "your-trello-api-key",
-  "token": "your-trello-token"
+  "apiKey": "",
+  "token": ""
 }
 ```
 
@@ -78,9 +78,12 @@ Recommended setup:
 
 ```bash
 mkdir -p ~/.config/jd2cv
-nano ~/.config/jd2cv/trello.json
+printf '{\n  "apiKey": "",\n  "token": ""\n}\n' > ~/.config/jd2cv/trello.json
 chmod 600 ~/.config/jd2cv/trello.json
+nano ~/.config/jd2cv/trello.json
 ```
+
+The user must fill `apiKey` and `token` locally and save the file. Never ask them to paste those values into chat.
 
 The helper refuses to use the file if group or other users have permissions on it.
 
