@@ -40,7 +40,7 @@ No extra Python package is required for the Trello helper; it uses the Python st
 
 ## LinkedIn Image Posts
 
-When a LinkedIn job post cannot be read but the JD is visible in an image, provide the direct image address instead of downloading the image manually. In LinkedIn this is usually available from the browser's image context menu and often points to `media.licdn.com`.
+When a LinkedIn job post contains the JD in an image, JD2CV first tries to inspect the image directly or extract/download its direct image URL. If that is not possible, provide the direct image address instead of downloading the image manually. In LinkedIn this is usually available from the browser's image context menu and often points to `media.licdn.com`.
 
 JD2CV downloads the image to `~/.codex/tmp/jd2cv/`, extracts the visible text with available vision/OCR capabilities, asks the user to confirm or correct the extracted text, and deletes the downloaded image after the workflow is complete.
 

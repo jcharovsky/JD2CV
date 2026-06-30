@@ -37,9 +37,11 @@ Tailor an ATS-safe CV template for a job posting URL in English or Spanish, with
 3. Access the URL, handling LinkedIn postings conservatively:
    - If the URL is a LinkedIn URL, try to open/read it once.
    - If the LinkedIn page is inaccessible, requires login, shows anti-bot/interstitial content, omits the job description, or cannot be confidently extracted, stop and ask the user to paste the full job description text in chat.
-   - If the job description appears in a LinkedIn image, ask the user to right-click the image and provide the direct image address, usually from `media.licdn.com`.
-   - If the user provides a direct LinkedIn image URL, download it to `~/.codex/tmp/jd2cv/`, extract the visible text using available vision/OCR capabilities, show the extracted job description text to the user, and ask for confirmation or corrections before continuing.
-   - Do not ask the user to manually download and re-upload LinkedIn images unless the direct image URL cannot be downloaded or read.
+   - If the accessible LinkedIn page contains the job description only or partly as an image, first try to inspect the image directly or extract its direct image URL from the page.
+   - If a direct image URL is available, download it to `~/.codex/tmp/jd2cv/`, extract the visible text using available vision/OCR capabilities, show the extracted job description text to the user, and ask for confirmation or corrections before continuing.
+   - If the image is visible but cannot be downloaded, use available vision/OCR directly on the visible image and ask the user to confirm the extracted text.
+   - If the LinkedIn page or image cannot be accessed reliably, ask the user to right-click the image and provide the direct image address, usually from `media.licdn.com`.
+   - Do not ask the user to manually download and re-upload LinkedIn images unless direct image URL download and direct visual inspection both fail.
    - Do not infer missing LinkedIn job details from the URL, title, or partial snippets.
    - Continue only after the posting content is available from the URL or from user-pasted text.
 4. Read the posting and extract:
