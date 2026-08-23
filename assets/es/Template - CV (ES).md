@@ -1,3 +1,8 @@
+---
+language: es
+title: Template - CV (ES)
+---
+
 # Tu Nombre Completo
 
 Tu rol objetivo o titular profesional
@@ -8,7 +13,9 @@ Tu sitio web | Tu LinkedIn | Tu GitHub | tu.email@example.com
 
 La skill completara esta seccion usando la informacion de la URL de la busqueda laboral provista y los datos relevantes ya presentes en tu plantilla de CV.
 
-Ejemplo: Profesional de software orientado a producto, con experiencia en herramientas de automatizacion, integraciones con APIs y mejora de procesos operativos para equipos interdisciplinarios.
+Ejemplo:
+
+Profesional de software orientado a producto, con experiencia en herramientas de automatizacion, integraciones con APIs y mejora de procesos operativos para equipos interdisciplinarios.
 
 ## Experiencia
 
@@ -44,7 +51,6 @@ Lista tu educacion aqui con un formato conciso y compatible con ATS. Inclui titu
 Ejemplo:
 
 **Licenciatura en Ciencias de la Computacion** | Universidad Ejemplo | 2020
-
 ## Certificaciones
 
 Lista tus certificaciones aqui. Inclui nombre de la certificacion, organizacion emisora y fecha de finalizacion.
@@ -52,7 +58,6 @@ Lista tus certificaciones aqui. Inclui nombre de la certificacion, organizacion 
 Ejemplo:
 
 **Certificacion Cloud Practitioner** | Proveedor Cloud Ejemplo | Mayo de 2023
-
 ## Habilidades
 
 Lista tus habilidades aqui usando comas. Inclui herramientas, tecnologias, metodologias, conocimiento de dominio y palabras clave del rol que sean verdaderas para tu perfil.
@@ -68,9 +73,7 @@ Lista tus idiomas aqui. Inclui nivel de dominio para cada idioma.
 Ejemplo:
 
 **Ingles** | Competencia Profesional
-
 **Español** | Nativo
-
 ## Honores y Premios
 
 Lista premios, honores, competencias, becas, publicaciones o distinciones que puedan fortalecer tus postulaciones. Conserva esta seccion solo cuando el contenido sea relevante o util para el rol objetivo.

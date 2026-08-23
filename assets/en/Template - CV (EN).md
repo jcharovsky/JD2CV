@@ -1,3 +1,8 @@
+---
+language: en
+title: Template - CV (EN)
+---
+
 # Your Full Name
 
 Your target role or professional headline
@@ -8,7 +13,9 @@ Your portfolio URL | Your LinkedIn URL | Your GitHub URL | your.email@example.co
 
 The skill will fill this section using the information from the provided job posting URL and the relevant facts already present in your CV template.
 
-Example: Product-focused software engineer with experience building automation tools, integrating APIs, and improving operational workflows for cross-functional teams.
+Example:
+
+Product-focused software engineer with experience building automation tools, integrating APIs, and improving operational workflows for cross-functional teams.
 
 ## Experience
 
@@ -44,7 +51,6 @@ List your education here in a concise ATS-friendly format. Include degree, insti
 Example:
 
 **B.S. in Computer Science** | Example University | 2020
-
 ## Certifications
 
 List your certifications here. Include certification name, issuing organization, and completion date.
@@ -52,7 +58,6 @@ List your certifications here. Include certification name, issuing organization,
 Example:
 
 **Cloud Practitioner Certification** | Example Cloud Provider | May 2023
-
 ## Skills
 
 List your skills here using commas. Include tools, technologies, methodologies, domain knowledge, and role-specific keywords that are true for your background.
@@ -68,9 +73,7 @@ List your languages here. Include proficiency level for each language.
 Example:
 
 **English** | Professional Working Proficiency
-
 **Spanish** | Native
-
 ## Honors & Awards
 
 List awards, honors, competitions, grants, scholarships, publications, or distinctions that may strengthen applications. Keep this section only when the content is relevant or useful for the target role.

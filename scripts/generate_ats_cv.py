@@ -1,5 +1,5 @@
+import argparse
 import html
-import os
 import re
 from pathlib import Path
 
@@ -9,9 +9,40 @@ from reportlab.lib.units import inch
 from reportlab.platypus import BaseDocTemplate, Frame, PageTemplate, Paragraph, Spacer
 
 
-ROOT = Path(__file__).resolve().parent
-SOURCE = Path(os.environ.get("CV_SOURCE", ROOT / "ATS_CV_Template_en.md"))
-OUTPUT = Path(os.environ.get("CV_OUTPUT", str(Path.home() / ".codex" / "tmp" / "jd2cv" / "ATS_CV_Template_en.pdf")))
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        description="Render an ATS CV Markdown file as an adjacent PDF."
+    )
+    parser.add_argument("source", type=Path, help="Markdown CV to render")
+    return parser.parse_args()
+
+
+def read_document(source: Path):
+    lines = source.read_text(encoding="utf-8").splitlines()
+    if not lines or lines[0].strip() != "---":
+        raise ValueError("Markdown must start with YAML front matter")
+
+    try:
+        metadata_end = next(
+            index for index, line in enumerate(lines[1:], start=1) if line.strip() == "---"
+        )
+    except StopIteration as error:
+        raise ValueError("Markdown front matter is missing its closing ---") from error
+
+    metadata = {}
+    for line in lines[1:metadata_end]:
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        key, separator, value = line.partition(":")
+        if not separator:
+            raise ValueError(f"Invalid front matter entry: {line}")
+        metadata[key.strip()] = value.strip().strip("\"'")
+
+    missing = [key for key in ("language", "title") if not metadata.get(key)]
+    if missing:
+        raise ValueError(f"Front matter is missing: {', '.join(missing)}")
+
+    return lines[metadata_end + 1 :], metadata
 
 
 def inline(text: str) -> str:
@@ -31,14 +62,16 @@ def p(text: str, style):
 def section(story, title, styles):
     story.append(Spacer(1, 8))
     story.append(p(title, styles["Section"]))
-    story.append(Spacer(1, 3))
+    content_gap = Spacer(1, 3)
+    content_gap.keepWithNext = True
+    story.append(content_gap)
 
 
 def build_styles():
     styles = getSampleStyleSheet()
     styles.add(ParagraphStyle(name="Name", parent=styles["Normal"], fontName="Helvetica-Bold", fontSize=16, leading=19, spaceAfter=8))
     styles.add(ParagraphStyle(name="Headline", parent=styles["Normal"], fontName="Helvetica", fontSize=10, leading=13, spaceAfter=6))
-    styles.add(ParagraphStyle(name="Section", parent=styles["Normal"], fontName="Helvetica-Bold", fontSize=13, leading=15, spaceBefore=8, spaceAfter=4))
+    styles.add(ParagraphStyle(name="Section", parent=styles["Normal"], fontName="Helvetica-Bold", fontSize=13, leading=15, spaceBefore=8, spaceAfter=4, keepWithNext=True))
     styles.add(ParagraphStyle(name="Role", parent=styles["Normal"], fontName="Helvetica-Bold", fontSize=10, leading=12, spaceBefore=3, spaceAfter=1, keepWithNext=True))
     styles.add(ParagraphStyle(name="Meta", parent=styles["Normal"], fontName="Helvetica-Oblique", fontSize=9, leading=11, textColor="#333333", spaceAfter=2, keepWithNext=True))
     styles.add(ParagraphStyle(name="Body", parent=styles["Normal"], fontName="Helvetica", fontSize=9.4, leading=11.5, spaceAfter=1))
@@ -47,17 +80,21 @@ def build_styles():
     return styles
 
 
-def build():
+def build(source: Path) -> Path:
+    source = source.expanduser().resolve()
+    if source.suffix.lower() != ".md":
+        raise ValueError("Source must be a Markdown file with a .md extension")
+    if not source.is_file():
+        raise ValueError(f"Source Markdown does not exist: {source}")
+
+    output = source.with_suffix(".pdf")
+    lines, metadata = read_document(source)
     styles = build_styles()
-    lines = SOURCE.read_text(encoding="utf-8").splitlines()
     story = []
     in_body = False
     previous_role = False
     blank_pending = False
     last_kind = None
-    current_section = None
-    compact_sections = {"Education", "Certifications", "Languages"}
-    previous_text = ""
 
     for index, raw in enumerate(lines):
         line = raw.strip()
@@ -67,8 +104,6 @@ def build():
         if (
             blank_pending
             and last_kind in {"body", "bullet"}
-            and current_section not in compact_sections
-            and not (last_kind == "body" and previous_text.endswith(":"))
         ):
             story.append(Spacer(1, 6))
         blank_pending = False
@@ -77,8 +112,7 @@ def build():
             last_kind = "name"
             continue
         if line.startswith("## "):
-            current_section = line[3:]
-            section(story, current_section, styles)
+            section(story, line[3:], styles)
             in_body = True
             previous_role = False
             last_kind = "section"
@@ -110,23 +144,31 @@ def build():
         style = styles["BodyKeep"] if line.endswith(":") else styles["Body"]
         story.append(p(line, style))
         last_kind = "body"
-        previous_text = line
 
     doc = BaseDocTemplate(
-        str(OUTPUT),
+        str(output),
         pagesize=LETTER,
         leftMargin=0.72 * inch,
         rightMargin=0.72 * inch,
         topMargin=0.58 * inch,
         bottomMargin=0.58 * inch,
-        title="ATS CV Template",
+        title=metadata["title"],
         author="JD2CV",
-        subject="ATS-friendly CV",
     )
     frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
     doc.addPageTemplates([PageTemplate(id="SingleColumn", frames=[frame])])
     doc.build(story)
+    return output
+
+
+def main():
+    args = parse_arguments()
+    try:
+        output = build(args.source)
+    except (OSError, ValueError) as error:
+        raise SystemExit(f"Error: {error}") from error
+    print(output)
 
 
 if __name__ == "__main__":
-    build()
+    main()

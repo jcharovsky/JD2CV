@@ -16,14 +16,14 @@ It helps an agent:
 ## Included Files
 
 - `SKILL.md`: Codex skill instructions.
-- `assets/en/ATS_CV_Template_en.md`: English generic ATS CV Markdown template.
-- `assets/en/ATS_CV_Template_en.pdf`: Rendered English sample PDF.
-- `assets/en/generate_ats_cv_en.py`: English Markdown-to-PDF generator.
-- `assets/es/ATS_CV_Template_es.md`: Spanish generic ATS CV Markdown template.
-- `assets/es/ATS_CV_Template_es.pdf`: Rendered Spanish sample PDF.
-- `assets/es/generate_ats_cv_es.py`: Spanish Markdown-to-PDF generator.
+- `assets/en/Template - CV (EN).md`: English generic ATS CV Markdown template.
+- `assets/en/Template - CV (EN).pdf`: Rendered English sample PDF.
+- `assets/es/Template - CV (ES).md`: Spanish generic ATS CV Markdown template.
+- `assets/es/Template - CV (ES).pdf`: Rendered Spanish sample PDF.
+- `scripts/generate_ats_cv.py`: Shared metadata-aware Markdown-to-PDF generator.
 - `scripts/render_cv.sh`: Helper that creates a local virtual environment, installs ReportLab if needed, and renders a PDF.
 - `scripts/trello_job_card.py`: Optional Trello card/checklist/upload helper that uses the Trello REST API.
+- `tests/test_generate_ats_cv.py`: Template-spacing and PDF-pagination regression tests.
 - `references/ats-rules.md`: ATS validation rules.
 - `references/trello-api.md`: Trello API helper usage notes.
 
@@ -104,9 +104,11 @@ When Trello is enabled, JD2CV creates the card in the selected list, adds checkl
 From this folder:
 
 ```bash
-./scripts/render_cv.sh ./assets/en/generate_ats_cv_en.py ./assets/en/ATS_CV_Template_en.pdf
-./scripts/render_cv.sh ./assets/es/generate_ats_cv_es.py ./assets/es/ATS_CV_Template_es.pdf
+./scripts/render_cv.sh "./assets/en/Template - CV (EN).md"
+./scripts/render_cv.sh "./assets/es/Template - CV (ES).md"
 ```
+
+The Markdown path is required. The generated PDF is written beside that file with the same name and a `.pdf` extension. The generator reads `language` and `title` from the Markdown front matter and uses `title` as the PDF title.
 
 The render helper uses `~/.codex/tmp/jd2cv/venv` by default. Override the work directory with:
 
@@ -117,5 +119,9 @@ export JD2CV_WORKDIR="/path/to/workdir"
 ## Template Editing
 
 The Markdown templates are intentionally generic. Replace the instructional content with the candidate's real facts before using the skill for applications. Keep the section structure simple and avoid tables, sidebars, images, icons, text boxes, or multi-column layouts.
+
+Blank lines between body items add vertical spacing in the PDF. Keep consecutive lines together when a section should remain compact.
+
+Keep exactly one blank line before and after every standalone `Example:` or `Ejemplo:` marker. Section headings stay on the same page as their first body paragraph.
 
 The summary section is a placeholder. During normal skill usage, the agent fills it from the job posting and the candidate facts already present in the selected template.

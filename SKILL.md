@@ -13,12 +13,13 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
 
 - English template set: `assets/en/`
 - Spanish template set: `assets/es/`
-- English files: `ATS_CV_Template_en.pdf`, `ATS_CV_Template_en.md`, and `generate_ats_cv_en.py`.
-- Spanish files: `ATS_CV_Template_es.pdf`, `ATS_CV_Template_es.md`, and `generate_ats_cv_es.py`.
+- English files: `Template - CV (EN).pdf` and `Template - CV (EN).md`.
+- Spanish files: `Template - CV (ES).pdf` and `Template - CV (ES).md`.
+- Shared generator: `scripts/generate_ats_cv.py`
 - Render helper: `scripts/render_cv.sh`
 - Work directory: `~/.codex/tmp/jd2cv/`
 - Trello preference file: `~/.codex/jd2cv/preferences.json`
-- Final output: `~/.codex/tmp/jd2cv/ATS_CV_Template.pdf`, unless the user requests a different candidate-specific filename.
+- Final source and output: `~/.codex/tmp/jd2cv/ATS_CV_Template.md` and `~/.codex/tmp/jd2cv/ATS_CV_Template.pdf`, unless the user requests a different candidate-specific base name.
 - Do not write generated CV files to Desktop.
 
 ## Required Workflow
@@ -44,6 +45,7 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
    - Use `assets/es/` when the posting is primarily in Spanish.
    - If the posting mixes languages, choose the language used for the main job description unless the user asks otherwise.
    - The tailoring proposal, generated CV content, and final PDF should use the selected language.
+   - Preserve the selected template's `language` and `title` front matter. The shared generator uses `title` as the PDF title.
 6. If Trello is enabled, create the Trello card before CV creation using `scripts/trello_job_card.py create-card`.
    - Board: value from `~/.codex/jd2cv/preferences.json`
    - List: value from `~/.codex/jd2cv/preferences.json`
@@ -61,9 +63,9 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
    - implement them if they fit the job posting and ATS strategy
    - correct them if needed, explaining why
 9. Wait for confirmation before applying tailoring edits.
-10. Copy the selected language source/generator into `~/.codex/tmp/jd2cv/work/`, edit only the temp copies, and generate review PDFs directly under `~/.codex/tmp/jd2cv/` until the user approves. Use `scripts/render_cv.sh` to render PDFs; it creates a temp venv under `~/.codex/tmp/jd2cv/venv` if needed.
-11. After confirmation, create the final PDF exactly at:
-   - `~/.codex/tmp/jd2cv/ATS_CV_Template.pdf`, unless the user requests a different candidate-specific filename
+10. Copy the selected Markdown source to `~/.codex/tmp/jd2cv/ATS_CV_Template.md`, or a requested candidate-specific `.md` name, and edit only that temp copy. Use `scripts/render_cv.sh <source.md>` to generate review PDFs until the user approves. The helper creates a temp venv under `~/.codex/tmp/jd2cv/venv` if needed. The PDF is always written beside the Markdown source with the same base name.
+11. After confirmation, the approved render is the final PDF exactly at:
+   - `~/.codex/tmp/jd2cv/ATS_CV_Template.pdf`, unless the user requested a different candidate-specific base name
    - Never create a generated CV on Desktop.
 12. Validate the final PDF. Read `references/ats-rules.md` and verify:
    - PDF text extracts correctly
@@ -91,6 +93,8 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
 - Keep `Honors & Awards` only if innovation, entrepreneurship, media, journalism, creativity, competitions, or early-career distinction are relevant to the role.
 - Education, Certifications, Languages, Volunteering, contact details, and other non-tailored sections must remain as they are in the selected base PDF unless the user explicitly asks for a change.
 - Use the selected posting language for the CV and tailoring proposal unless the user asks otherwise.
+- Blank lines between body items add vertical spacing in the PDF. Keep consecutive lines together where compact spacing is intended.
+- Keep exactly one blank line before and after every standalone `Example:` or `Ejemplo:` marker.
 - For image-based job descriptions from any site, always confirm extracted OCR/vision text before using it for Trello card creation, CV tailoring, keyword selection, or language detection.
 
 ## Maintenance Notes
