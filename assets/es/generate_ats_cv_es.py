@@ -19,8 +19,13 @@ def inline(text: str) -> str:
     return re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", text)
 
 
+class NonSplittingParagraph(Paragraph):
+    def split(self, avail_width, avail_height):
+        return []
+
+
 def p(text: str, style):
-    return Paragraph(inline(text), style)
+    return NonSplittingParagraph(inline(text), style)
 
 
 def section(story, title, styles):
@@ -34,9 +39,11 @@ def build_styles():
     styles.add(ParagraphStyle(name="Name", parent=styles["Normal"], fontName="Helvetica-Bold", fontSize=16, leading=19, spaceAfter=8))
     styles.add(ParagraphStyle(name="Headline", parent=styles["Normal"], fontName="Helvetica", fontSize=10, leading=13, spaceAfter=6))
     styles.add(ParagraphStyle(name="Section", parent=styles["Normal"], fontName="Helvetica-Bold", fontSize=13, leading=15, spaceBefore=8, spaceAfter=4))
-    styles.add(ParagraphStyle(name="Role", parent=styles["Normal"], fontName="Helvetica-Bold", fontSize=10, leading=12, spaceBefore=3, spaceAfter=1))
-    styles.add(ParagraphStyle(name="Meta", parent=styles["Normal"], fontName="Helvetica-Oblique", fontSize=9, leading=11, textColor="#333333", spaceAfter=2))
-    styles.add(ParagraphStyle(name="Body", parent=styles["Normal"], fontName="Helvetica", fontSize=9.4, leading=11.5, spaceAfter=1))
+    styles.add(ParagraphStyle(name="Role", parent=styles["Normal"], fontName="Helvetica-Bold", fontSize=10, leading=12, spaceBefore=3, spaceAfter=1, keepWithNext=True))
+    styles.add(ParagraphStyle(name="Meta", parent=styles["Normal"], fontName="Helvetica-Oblique", fontSize=9, leading=11, textColor="#333333", spaceAfter=2, keepWithNext=True))
+    styles.add(ParagraphStyle(name="Body", parent=styles["Normal"], fontName="Helvetica", fontSize=9.4, leading=11.1, spaceAfter=1))
+    styles.add(ParagraphStyle(name="BodyKeep", parent=styles["Body"], keepWithNext=True))
+    styles.add(ParagraphStyle(name="BulletKeep", parent=styles["Body"], keepWithNext=True))
     return styles
 
 
@@ -52,7 +59,7 @@ def build():
     compact_sections = {"Educación", "Certificaciones", "Idiomas"}
     previous_text = ""
 
-    for raw in lines:
+    for index, raw in enumerate(lines):
         line = raw.strip()
         if not line:
             blank_pending = True
@@ -95,10 +102,13 @@ def build():
             last_kind = "meta"
             continue
         if line.startswith("- "):
-            story.append(p(line, styles["Body"]))
+            next_line = next((candidate.strip() for candidate in lines[index + 1:] if candidate.strip()), "")
+            style = styles["BulletKeep"] if next_line.startswith("- ") else styles["Body"]
+            story.append(p(line, style))
             last_kind = "bullet"
             continue
-        story.append(p(line, styles["Body"]))
+        style = styles["BodyKeep"] if line.endswith(":") else styles["Body"]
+        story.append(p(line, style))
         last_kind = "body"
         previous_text = line
 
