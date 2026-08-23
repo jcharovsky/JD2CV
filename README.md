@@ -16,10 +16,8 @@ It helps an agent:
 ## Included Files
 
 - `SKILL.md`: Codex skill instructions.
-- `assets/en/Template - CV (EN).md`: English generic ATS CV Markdown template.
-- `assets/en/Template - CV (EN).pdf`: Rendered English sample PDF.
-- `assets/es/Template - CV (ES).md`: Spanish generic ATS CV Markdown template.
-- `assets/es/Template - CV (ES).pdf`: Rendered Spanish sample PDF.
+- `assets/en/`: English Markdown CV and its rendered PDF.
+- `assets/es/`: Spanish Markdown CV and its rendered PDF.
 - `scripts/generate_ats_cv.py`: Shared metadata-aware Markdown-to-PDF generator.
 - `scripts/render_cv.sh`: Helper that creates a local virtual environment, installs ReportLab if needed, and renders a PDF.
 - `scripts/trello_job_card.py`: Optional Trello card/checklist/upload helper that uses the Trello REST API.
@@ -104,11 +102,11 @@ When Trello is enabled, JD2CV creates the card in the selected list, adds checkl
 From this folder:
 
 ```bash
-./scripts/render_cv.sh "./assets/en/Template - CV (EN).md"
-./scripts/render_cv.sh "./assets/es/Template - CV (ES).md"
+find ./assets/en -maxdepth 1 -name '*.md' -exec ./scripts/render_cv.sh {} \;
+find ./assets/es -maxdepth 1 -name '*.md' -exec ./scripts/render_cv.sh {} \;
 ```
 
-The Markdown path is required. The generated PDF is written beside that file with the same name and a `.pdf` extension. The generator reads `language` and `title` from the Markdown front matter and uses `title` as the PDF title.
+Each language directory contains exactly one Markdown CV. The generated PDF is written beside that file with the same name and a `.pdf` extension. The generator reads `language` and `title` from the Markdown front matter and uses `title` as the PDF title.
 
 The render helper uses `~/.codex/tmp/jd2cv/venv` by default. Override the work directory with:
 

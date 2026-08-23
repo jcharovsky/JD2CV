@@ -13,8 +13,8 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
 
 - English template set: `assets/en/`
 - Spanish template set: `assets/es/`
-- English files: `Template - CV (EN).pdf` and `Template - CV (EN).md`.
-- Spanish files: `Template - CV (ES).pdf` and `Template - CV (ES).md`.
+- Each language directory contains exactly one base Markdown CV and its matching PDF.
+- Template filenames may be generic or candidate-specific. Select the sole Markdown file in the chosen language directory.
 - Shared generator: `scripts/generate_ats_cv.py`
 - Render helper: `scripts/render_cv.sh`
 - Work directory: `~/.codex/tmp/jd2cv/`

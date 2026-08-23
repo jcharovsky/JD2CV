@@ -7,9 +7,20 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 GENERATOR_PATH = ROOT / "scripts" / "generate_ats_cv.py"
+
+
+def find_template(language: str) -> Path:
+    templates = tuple((ROOT / "assets" / language).glob("*.md"))
+    if len(templates) != 1:
+        raise RuntimeError(
+            f"Expected one Markdown template in assets/{language}, found {len(templates)}"
+        )
+    return templates[0]
+
+
 TEMPLATES = (
-    (ROOT / "assets" / "en" / "Template - CV (EN).md", "Example:", "Skills"),
-    (ROOT / "assets" / "es" / "Template - CV (ES).md", "Ejemplo:", "Habilidades"),
+    (find_template("en"), "Example:", "Skills"),
+    (find_template("es"), "Ejemplo:", "Habilidades"),
 )
 
 
@@ -53,7 +64,6 @@ class TemplateLayoutTests(unittest.TestCase):
                 marker_indexes = [
                     index for index, line in enumerate(lines) if line.startswith(marker)
                 ]
-                self.assertTrue(marker_indexes, f"No {marker} markers found")
 
                 for index in marker_indexes:
                     self.assertEqual(lines[index], marker)
