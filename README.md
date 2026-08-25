@@ -7,11 +7,11 @@ It helps an agent:
 - Read a job posting URL and extract company, position, requirements, responsibilities, keywords, and posting language.
 - Handle inaccessible job URLs from any site by asking for pasted job-description text when the page cannot be reliably read.
 - Handle image-based JDs from any site by using accessible page images, direct image URLs, or confirmed OCR/vision text.
-- Optionally create a Trello application card for the opportunity through JD2CV's custom Trello API helper.
+- Optionally create a Trello application card in the board's `CV` list through JD2CV's custom Trello API helper.
 - Select the English or Spanish ATS CV template.
 - Propose CV tailoring decisions before editing.
 - Generate review PDFs and a final text-based, single-column ATS PDF.
-- Optionally upload the final PDF to the Trello card, verify the attachment, and mark the CV checklist item complete.
+- Optionally upload the final PDF to the Trello card and verify the attachment.
 
 ## Included Files
 
@@ -20,7 +20,7 @@ It helps an agent:
 - `assets/es/`: Spanish Markdown CV and its rendered PDF.
 - `scripts/generate_ats_cv.py`: Shared metadata-aware Markdown-to-PDF generator.
 - `scripts/render_cv.sh`: Helper that creates a local virtual environment, installs ReportLab if needed, and renders a PDF.
-- `scripts/trello_job_card.py`: Optional Trello card/checklist/upload helper that uses the Trello REST API.
+- `scripts/trello_job_card.py`: Optional Trello card and CV upload helper that uses the Trello REST API.
 - `tests/test_generate_ats_cv.py`: Template-spacing and PDF-pagination regression tests.
 - `references/ats-rules.md`: ATS validation rules.
 - `references/trello-api.md`: Trello API helper usage notes.
@@ -49,7 +49,7 @@ Downloaded JD images go to `~/.codex/tmp/jd2cv/`. JD2CV extracts visible text wi
 
 JD2CV's Trello integration is optional. The skill asks whether to use Trello before reading the job URL or starting CV work.
 
-If Trello is enabled, the skill first handles credentials, then uses the Trello API to list the user's open boards and asks the user to choose one. It then lists the open lists in that board and asks the user to choose the destination list. The selected board/list are saved as non-secret preferences.
+If Trello is enabled, the skill first handles credentials, then uses the Trello API to list the user's open boards and asks the user to choose one. The selected board is saved as a non-secret preference. Cards are created in the board's existing `CV` list.
 
 The helper reads credentials from a local config file:
 
@@ -88,14 +88,13 @@ The skill asks whether to use Trello only when this preference is missing, or wh
 ```json
 {
   "trello_enabled": true,
-  "trello_board": "Job Applications",
-  "trello_list": "Doing"
+  "trello_board": "Job Applications"
 }
 ```
 
 Delete or edit that file to reset the preference.
 
-When Trello is enabled, JD2CV creates the card in the selected list, adds checklist `General`, adds `CV.`, `Application.`, `Interview.`, and `Contract.`, uploads the final PDF, verifies the attachment, and marks `CV.` complete.
+When Trello is enabled, JD2CV creates a checklist-free card in the board's `CV` list, uploads the final PDF, and verifies the attachment. The card remains in `CV` until the user moves it manually to another progress list.
 
 ## Rendering the Sample PDFs
 

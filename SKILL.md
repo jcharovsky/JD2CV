@@ -28,12 +28,12 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
 2. Before reading the URL or discussing CV tailoring, resolve Trello:
    - If the request explicitly enables/disables Trello, follow it and update `~/.codex/jd2cv/preferences.json`.
    - Otherwise read that file; if absent, ask once whether to use Trello.
-   - Save only non-secrets, e.g. `{"trello_enabled": true, "trello_board": "Job Applications", "trello_list": "Doing"}` or `{"trello_enabled": false}`.
+   - Save only non-secrets, e.g. `{"trello_enabled": true, "trello_board": "Job Applications"}` or `{"trello_enabled": false}`.
    - If disabled, skip Trello. If enabled, ask immediately whether the user has a Trello account and API key/token. If not, read `references/trello-api.md` and guide setup before URL/CV work.
    - Create `~/.config/jd2cv/trello.json` scaffold with empty `apiKey`/`token`, run `chmod 600`, and tell the user to fill it locally. Never request or print credentials.
    - After creating the credential scaffold, stop and wait for the user to confirm they filled it. Do not read the job URL, create a Trello card, or start CV work until the user confirms the credential file is ready.
    - After confirmation, verify the credential file exists, has `600` permissions, and does not contain empty `apiKey` or `token` values.
-   - Then run `scripts/trello_job_card.py list-boards`, show the open boards, ask the user to pick one, run `scripts/trello_job_card.py list-lists --board "..."`, show that board's open lists, ask the user to pick one, and save `trello_board`/`trello_list` in `~/.codex/jd2cv/preferences.json`.
+   - Then run `scripts/trello_job_card.py list-boards`, show the open boards, ask the user to pick one, and save `trello_board` in `~/.codex/jd2cv/preferences.json`.
 3. Access the URL:
    - Try to read once. If inaccessible, login-gated, anti-bot, incomplete, or uncertain, ask the user to paste the full JD text in chat.
    - If the JD is image-based on any site, inspect the image or extract/download its direct URL to `~/.codex/tmp/jd2cv/`, OCR/vision it, show extracted text, and ask for confirmation.
@@ -48,9 +48,10 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
    - Preserve the selected template's `language` and `title` front matter. The shared generator uses `title` as the PDF title.
 6. If Trello is enabled, create the Trello card before CV creation using `scripts/trello_job_card.py create-card`.
    - Board: value from `~/.codex/jd2cv/preferences.json`
-   - List: value from `~/.codex/jd2cv/preferences.json`
+   - List: `CV`
    - Card name: `[COMPANY NAME] - [POSITION NAME]`
    - Description: `[Job posting](provided URL)`
+   - Leave the card in `CV`; the user moves it between progress lists manually.
 7. Prepare a tailoring proposal before editing the CV. Include:
    - replacement Professional Summary / Perfil Profesional for the template summary placeholder
    - `Experience` / `Experiencia`: keep/remove
@@ -78,7 +79,6 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
 14. If Trello is enabled, read `references/trello-api.md` and use `scripts/trello_job_card.py upload-cv --delete`.
    - Upload the final PDF from `~/.codex/tmp/jd2cv/` to the Trello card created earlier.
    - Read the card after upload and verify the file is attached.
-   - Mark checklist item `CV.` complete.
    - Delete the final temp PDF only after upload verification succeeds.
 15. Delete temporary generated files from `~/.codex/tmp/jd2cv/` after the workflow is complete, including downloaded job-description images. `trello-card.json` may be kept during the active workflow if needed for recovery.
 
@@ -107,3 +107,4 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
 - Save non-secret preferences in `~/.codex/jd2cv/preferences.json`, never in the repo/skill.
 - The helper calls Trello REST API and reads credentials only from `~/.config/jd2cv/trello.json`; scaffold it, `chmod 600`, have user fill it locally, and never print/request key or token.
 - If Trello card creation succeeds, preserve the generated card state path in the working notes for later upload.
+- Create cards without checklists in the board's `CV` list. The user manages later progress by moving cards manually.

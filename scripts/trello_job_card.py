@@ -2,7 +2,6 @@
 import argparse
 import json
 import mimetypes
-import os
 import ssl
 import stat
 import sys
@@ -16,8 +15,7 @@ from pathlib import Path
 API = "https://api.trello.com/1"
 DEFAULT_CONFIG = Path.home() / ".config" / "jd2cv" / "trello.json"
 DEFAULT_WORKDIR = Path.home() / ".codex" / "tmp" / "jd2cv"
-DEFAULT_CHECKLIST = "General"
-DEFAULT_ITEMS = ["CV.", "Application.", "Interview.", "Contract."]
+DEFAULT_LIST = "CV"
 
 
 def check_config_permissions(config_path: Path):
@@ -129,7 +127,7 @@ def create_card(args):
     boards = request("GET", "/members/me/boards", key, token, {"fields": "name", "filter": "open"})
     board = find_named(boards, args.board, "board")
     lists = request("GET", f"/boards/{board['id']}/lists", key, token, {"fields": "name", "filter": "open"})
-    trello_list = find_named(lists, args.list, "list")
+    trello_list = find_named(lists, DEFAULT_LIST, "list")
     card = request(
         "POST",
         "/cards",
@@ -142,23 +140,10 @@ def create_card(args):
             "pos": "bottom",
         },
     )
-    checklist = request("POST", f"/cards/{card['id']}/checklists", key, token, data={"name": DEFAULT_CHECKLIST})
-    check_items = []
-    for item_name in DEFAULT_ITEMS:
-        item = request(
-            "POST",
-            f"/checklists/{checklist['id']}/checkItems",
-            key,
-            token,
-            data={"name": item_name, "pos": "bottom", "checked": "false"},
-        )
-        check_items.append(item)
     state = {
         "board": board,
         "list": trello_list,
         "card": card,
-        "checklist": checklist,
-        "check_items": check_items,
     }
     args.workdir.mkdir(parents=True, exist_ok=True)
     state_path = args.workdir / "trello-card.json"
@@ -184,16 +169,12 @@ def upload_cv(args):
     attachments = request("GET", f"/cards/{card_id}/attachments", key, token)
     if not any(att.get("id") == upload.get("id") or att.get("name") == pdf.name for att in attachments):
         raise RuntimeError("Upload verification failed: attachment not found on card")
-    cv_item = next((item for item in state["check_items"] if item.get("name") == "CV."), None)
-    if not cv_item:
-        raise RuntimeError("Could not find checklist item named 'CV.' in saved card state")
-    request("PUT", f"/cards/{card_id}/checkItem/{cv_item['id']}", key, token, data={"state": "complete"})
     card = request(
         "GET",
         f"/cards/{card_id}",
         key,
         token,
-        {"attachments": "true", "checklists": "all", "fields": "name,shortUrl"},
+        {"attachments": "true", "fields": "name,shortUrl"},
     )
     if not any(att.get("name") == pdf.name for att in card.get("attachments", [])):
         raise RuntimeError("Final card read failed: uploaded file is not visible in card attachments")
@@ -203,7 +184,7 @@ def upload_cv(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Create Trello job cards and upload CV PDFs.")
+    parser = argparse.ArgumentParser(description="Create Trello job cards in the CV list and upload CV PDFs.")
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     sub = parser.add_subparsers(dest="cmd", required=True)
 
@@ -219,7 +200,6 @@ def main():
     create.add_argument("--company", required=True)
     create.add_argument("--position", required=True)
     create.add_argument("--board", required=True)
-    create.add_argument("--list", required=True)
     create.add_argument("--workdir", type=Path, default=DEFAULT_WORKDIR)
     create.set_defaults(func=create_card)
 

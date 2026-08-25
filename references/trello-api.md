@@ -10,13 +10,12 @@ Check:
 ~/.codex/jd2cv/preferences.json
 ```
 
-If it exists and includes board/list, use it unless the user asks to change it. If absent, ask once. If enabled, save `trello_enabled` first, then discover board/list after credentials work:
+If it exists and includes a board, use it unless the user asks to change it. If absent, ask once. If enabled, save `trello_enabled` first, then discover the board after credentials work:
 
 ```json
 {
   "trello_enabled": true,
-  "trello_board": "Job Applications",
-  "trello_list": "Doing"
+  "trello_board": "Job Applications"
 }
 ```
 
@@ -72,7 +71,7 @@ The helper refuses to use the file if group or other users have permissions on i
 
 After creating the scaffold, stop and wait for the user to confirm they filled it. Do not read the job URL or start CV work until confirmed. After confirmation, verify the file exists, has `600` permissions, and has non-empty `apiKey` and `token` values.
 
-## Board/List Selection
+## Board Selection
 
 After credential verification, list open boards:
 
@@ -80,36 +79,28 @@ After credential verification, list open boards:
 python scripts/trello_job_card.py list-boards
 ```
 
-Show the board names to the user and ask them to pick one. Then list that board's open lists:
-
-```bash
-python scripts/trello_job_card.py list-lists --board "Job Applications"
-```
-
-Show the list names and ask the user to pick one. Save:
+Show the board names to the user and ask them to pick one. Save:
 
 ```json
 {
   "trello_enabled": true,
-  "trello_board": "chosen board",
-  "trello_list": "chosen list"
+  "trello_board": "chosen board"
 }
 ```
 
 ## Card Creation
 
-Use saved board/list:
+Use the saved board:
 
 ```bash
 python scripts/trello_job_card.py create-card \
   --job-url "https://example.com/job" \
   --company "Company" \
   --position "Position" \
-  --board "Job Applications" \
-  --list "Doing"
+  --board "Job Applications"
 ```
 
-Creates card `[COMPANY] - [POSITION]`, description `[Job posting](URL)`, checklist `General`, unchecked items `CV.`, `Application.`, `Interview.`, `Contract.`, and writes `~/.codex/tmp/jd2cv/trello-card.json`.
+Creates card `[COMPANY] - [POSITION]` at the bottom of the board's `CV` list, sets description `[Job posting](URL)`, and writes `~/.codex/tmp/jd2cv/trello-card.json`. The card has no checklist. The user moves it between progress lists manually.
 
 ## Final Upload
 
@@ -119,4 +110,4 @@ python scripts/trello_job_card.py upload-cv \
   --delete
 ```
 
-Uploads PDF, verifies attachment, marks `CV.` complete, and deletes the temp PDF only after verification when `--delete` is used.
+Uploads the PDF, verifies the attachment, and deletes the temp PDF only after verification when `--delete` is used. The card remains in the `CV` list.
