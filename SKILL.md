@@ -19,7 +19,7 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
 - Render helper: `scripts/render_cv.sh`
 - Work directory: `~/.codex/tmp/jd2cv/`
 - Trello preference file: `~/.codex/jd2cv/preferences.json`
-- Final source and output: `~/.codex/tmp/jd2cv/ATS_CV_Template.md` and `~/.codex/tmp/jd2cv/ATS_CV_Template.pdf`, unless the user requests a different candidate-specific base name.
+- Final source and output: copies under `~/.codex/tmp/jd2cv/` that preserve the selected Markdown asset's base filename. A user-requested candidate-specific base name replaces it for both files.
 - Do not write generated CV files to Desktop.
 
 ## Required Workflow
@@ -64,9 +64,9 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
    - implement them if they fit the job posting and ATS strategy
    - correct them if needed, explaining why
 9. Wait for confirmation before applying tailoring edits.
-10. Copy the selected Markdown source to `~/.codex/tmp/jd2cv/ATS_CV_Template.md`, or a requested candidate-specific `.md` name, and edit only that temp copy. Use `scripts/render_cv.sh <source.md>` to generate review PDFs until the user approves. The helper runs the generator through the skill's locked `uv` environment. The PDF is always written beside the Markdown source with the same base name.
+10. Copy the selected Markdown source into `~/.codex/tmp/jd2cv/` with its filename unchanged, and edit only that temp copy. If the user requests a candidate-specific base name, apply it to the temp Markdown file before editing. Use `scripts/render_cv.sh <source.md>` to generate review PDFs until the user approves. The helper runs the generator through the skill's locked `uv` environment. The PDF is always written beside the Markdown source with the same base name.
 11. After confirmation, the approved render is the final PDF exactly at:
-   - `~/.codex/tmp/jd2cv/ATS_CV_Template.pdf`, unless the user requested a different candidate-specific base name
+   - `~/.codex/tmp/jd2cv/{selected-stem}.pdf`, where `{selected-stem}` is the selected asset Markdown stem or the user-requested candidate-specific base name
    - Never create a generated CV on Desktop.
 12. Validate the final PDF. Read `references/ats-rules.md` and verify:
    - PDF text extracts correctly
