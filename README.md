@@ -19,7 +19,7 @@ It helps an agent:
 - `assets/en/`: English Markdown CV and its rendered PDF.
 - `assets/es/`: Spanish Markdown CV and its rendered PDF.
 - `scripts/generate_ats_cv.py`: Shared metadata-aware Markdown-to-PDF generator.
-- `scripts/render_cv.sh`: Helper that creates a local virtual environment, installs ReportLab if needed, and renders a PDF.
+- `scripts/render_cv.sh`: Helper that runs the PDF generator through the locked `uv` environment.
 - `scripts/trello_job_card.py`: Optional Trello card and CV upload helper that uses the Trello REST API.
 - `tests/test_generate_ats_cv.py`: Template-spacing and PDF-pagination regression tests.
 - `references/ats-rules.md`: ATS validation rules.
@@ -28,9 +28,8 @@ It helps an agent:
 ## Requirements
 
 - Codex with local skills support.
-- Python 3 with `venv`.
-- `pip`, used by `scripts/render_cv.sh` to install `reportlab` in a temporary virtual environment.
-- Network access when installing `reportlab` or using Trello.
+- `uv`, which manages the Python interpreter and isolated environment.
+- Network access during the initial `uv` synchronization or when using Trello.
 - Trello API key/token only if using the optional Trello integration.
 
 No Trello setup is required for local-only CV generation.
@@ -107,10 +106,15 @@ find ./assets/es -maxdepth 1 -name '*.md' -exec ./scripts/render_cv.sh {} \;
 
 Each language directory contains exactly one Markdown CV. The generated PDF is written beside that file with the same name and a `.pdf` extension. The generator reads `language` and `title` from the Markdown front matter and uses `title` as the PDF title.
 
-The render helper uses `~/.codex/tmp/jd2cv/venv` by default. Override the work directory with:
+The render helper synchronizes the environment from `pyproject.toml` and `uv.lock` when needed. Generated Markdown and PDF files remain in the location supplied to the helper.
+
+## Development
+
+Synchronize the environment and run the tests from the repository root:
 
 ```bash
-export JD2CV_WORKDIR="/path/to/workdir"
+uv sync
+uv run python -m unittest discover -s tests -v
 ```
 
 ## Template Editing

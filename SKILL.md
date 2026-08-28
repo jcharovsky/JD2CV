@@ -64,7 +64,7 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
    - implement them if they fit the job posting and ATS strategy
    - correct them if needed, explaining why
 9. Wait for confirmation before applying tailoring edits.
-10. Copy the selected Markdown source to `~/.codex/tmp/jd2cv/ATS_CV_Template.md`, or a requested candidate-specific `.md` name, and edit only that temp copy. Use `scripts/render_cv.sh <source.md>` to generate review PDFs until the user approves. The helper creates a temp venv under `~/.codex/tmp/jd2cv/venv` if needed. The PDF is always written beside the Markdown source with the same base name.
+10. Copy the selected Markdown source to `~/.codex/tmp/jd2cv/ATS_CV_Template.md`, or a requested candidate-specific `.md` name, and edit only that temp copy. Use `scripts/render_cv.sh <source.md>` to generate review PDFs until the user approves. The helper runs the generator through the skill's locked `uv` environment. The PDF is always written beside the Markdown source with the same base name.
 11. After confirmation, the approved render is the final PDF exactly at:
    - `~/.codex/tmp/jd2cv/ATS_CV_Template.pdf`, unless the user requested a different candidate-specific base name
    - Never create a generated CV on Desktop.

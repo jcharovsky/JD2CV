@@ -76,7 +76,7 @@ After creating the scaffold, stop and wait for the user to confirm they filled i
 After credential verification, list open boards:
 
 ```bash
-python scripts/trello_job_card.py list-boards
+uv run python scripts/trello_job_card.py list-boards
 ```
 
 Show the board names to the user and ask them to pick one. Save:
@@ -93,7 +93,7 @@ Show the board names to the user and ask them to pick one. Save:
 Use the saved board:
 
 ```bash
-python scripts/trello_job_card.py create-card \
+uv run python scripts/trello_job_card.py create-card \
   --job-url "https://example.com/job" \
   --company "Company" \
   --position "Position" \
@@ -105,7 +105,7 @@ Creates card `[COMPANY] - [POSITION]` at the bottom of the board's `CV` list, se
 ## Final Upload
 
 ```bash
-python scripts/trello_job_card.py upload-cv \
+uv run python scripts/trello_job_card.py upload-cv \
   --file "$HOME/.codex/tmp/jd2cv/ATS_CV_Template.pdf" \
   --delete
 ```

@@ -1,0 +1,12 @@
+[project]
+name = "jd2cv"
+version = "0.1.0"
+description = "Tailor ATS-safe CVs from job descriptions."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "reportlab",
+]
+
+[tool.uv]
+package = false
