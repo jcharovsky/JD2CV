@@ -38,6 +38,42 @@ No Trello setup is required for local-only CV generation.
 
 No extra Python package is required for the Trello helper; it uses the Python standard library.
 
+## Installation
+
+Codex installs GitHub-hosted skills through its built-in `$skill-installer`. In Codex, enter:
+
+```text
+$skill-installer Install the skill from https://github.com/jcharovsky/JD2CV. The skill is at the repository root and should be named jd2cv.
+```
+
+The installer places the skill under `$CODEX_HOME/skills/jd2cv`, using `~/.codex/skills/jd2cv` when `CODEX_HOME` is unset. Install `uv` before continuing, then confirm that it is available:
+
+```bash
+uv --version
+```
+
+Synchronize the locked environment, initialize the demanded-skills dataset, and run the validation suite:
+
+```bash
+JD2CV_SKILL_DIR="${CODEX_HOME:-$HOME/.codex}/skills/jd2cv"
+JD2CV_DATA_DIR="$HOME/.codex/jd2cv"
+
+cd "$JD2CV_SKILL_DIR"
+uv sync --locked
+mkdir -p "$JD2CV_DATA_DIR"
+if [ ! -e "$JD2CV_DATA_DIR/demanded-skills.json" ]
+then
+  cp assets/demanded-skills.template.json "$JD2CV_DATA_DIR/demanded-skills.json"
+fi
+uv run python -m unittest discover -s tests -v
+```
+
+The initialization preserves an existing `~/.codex/jd2cv/demanded-skills.json` when updating JD2CV.
+
+Replace the instructional content in both Markdown files under `assets/en/` and `assets/es/` with the candidate's real facts. Then recreate both base PDFs using the commands under **Rendering the Sample PDFs**. Trello setup remains optional and is covered under **Optional Trello Integration**.
+
+JD2CV becomes available on the next Codex turn. If it does not appear, restart Codex and invoke it with `$jd2cv` and a job posting URL. See the [official OpenAI skill documentation](https://learn.chatgpt.com/docs/build-skills) for skill discovery and installation behavior.
+
 ## Demanded Skills Tracking
 
 JD2CV records skills explicitly requested by confirmed job postings in `~/.codex/jd2cv/demanded-skills.json`. Each entry contains the canonical bilingual skill name, the number of distinct positions that demand it, the corresponding `COMPANY - POSITION` labels, and a `Known` or `Unknown` status.
