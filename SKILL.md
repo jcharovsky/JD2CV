@@ -1,13 +1,13 @@
 ---
 name: jd2cv
-description: Use when the user provides a job posting URL and wants to analyze the role, tailor a generic ATS CV template, generate the final PDF, and optionally create a Trello application card through JD2CV's custom Trello API helper. Trigger for job application, CV, resume, vacancy, role, position, job description, or JD URLs.
+description: Analyze a job posting URL, tailor an English or Spanish ATS CV, track demanded skills, optionally manage a Trello application card, or synchronize known skills from JD2CV CV templates. Use for job applications, CV or resume tailoring, vacancy or role descriptions, JD URLs, and JD2CV template-skill synchronization.
 ---
 
 # JD2CV
 
 ## Purpose
 
-Tailor an ATS-safe CV template for an English or Spanish job URL, with optional Trello tracking through JD2CV's Python API helper. Preserve the simple, single-column, text-based PDF format.
+Tailor an ATS-safe CV template for an English or Spanish job URL, track market demand against the candidate's known skills, and optionally manage Trello applications. Synchronize known skills from the maintained CV templates when requested. Preserve the simple, single-column, text-based PDF format.
 
 ## Assets
 
@@ -25,6 +25,8 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
 - Do not write generated CV files to Desktop.
 
 ## Required Workflow
+
+Use this workflow for a job posting. For a request to synchronize skills from the CV templates, follow **Template Skills Synchronization** instead and skip the job-posting and Trello workflows.
 
 1. Receive a job posting URL.
 2. Before reading the URL or discussing CV tailoring, resolve Trello:
@@ -86,6 +88,22 @@ Tailor an ATS-safe CV template for an English or Spanish job URL, with optional 
    - Delete the final temp PDF only after upload verification succeeds.
 16. Delete temporary generated files from `~/.codex/tmp/jd2cv/` after the workflow is complete, including downloaded job-description images. `trello-card.json` may be kept during the active workflow if needed for recovery.
 
+## Template Skills Synchronization
+
+When the user asks to synchronize or refresh known skills from the CV templates:
+
+1. Read the sole Markdown file in both `assets/en/` and `assets/es/`, plus `~/.codex/jd2cv/demanded-skills.json`.
+2. Extract only the candidate's actual entries from `Skills` and `Habilidades`. Ignore instructional text, placeholders, and content presented under standalone `Example:` or `Ejemplo:` markers. If neither template contains actual skills, report that there is nothing to synchronize and leave the JSON unchanged.
+3. Pair equivalent English and Spanish skill names. Store a language-neutral name once, and store different translations as `English name / Spanish name`. Flag uncertain pairings instead of guessing.
+4. Prepare a merge that:
+   - adds each new template skill with `demand_count: 0`, empty `positions`, and `status: "Known"`
+   - preserves `demand_count` and `positions` for every matched entry
+   - changes a matched `Unknown` entry to `Known`
+   - improves the canonical bilingual name when the templates establish a clear pairing
+   - preserves entries absent from the templates without deleting or downgrading them
+5. Show all proposed additions, status changes, canonical-name changes, and uncertain pairings. Wait for the user's confirmation or corrections before writing the JSON.
+6. Apply the confirmed merge and validate that every actual template skill is represented once, every status is `Known` or `Unknown`, and every `demand_count` equals the length of `positions`.
+
 ## Demanded Skills Tracking
 
 Read `~/.codex/jd2cv/demanded-skills.json` and preserve this schema:
@@ -103,6 +121,7 @@ Read `~/.codex/jd2cv/demanded-skills.json` and preserve this schema:
 }
 ```
 
+- If `skills` is empty while either base template contains actual non-placeholder skills, ask whether to run **Template Skills Synchronization** before classifying the posting. Continue directly only when the user declines.
 - Track every skill, tool, technology, methodology, or domain competency explicitly requested in the confirmed posting. Include required and preferred qualifications. Do not infer unstated demand.
 - Match existing entries case-insensitively against either side of a bilingual name. Merge clear translations and spelling variants only when they denote the same skill, and preserve the existing canonical name.
 - Store language-neutral names once. Store names that differ between English and Spanish as `English name / Spanish name`.

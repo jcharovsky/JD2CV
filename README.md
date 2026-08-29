@@ -11,6 +11,7 @@ It helps an agent:
 - Select the English or Spanish ATS CV template.
 - Propose CV tailoring decisions before editing.
 - Track skills demanded across job postings and classify them as known or unknown to the candidate.
+- Synchronize known skills from the candidate's English and Spanish CV templates.
 - Generate review PDFs and a final text-based, single-column ATS PDF.
 - Optionally upload the final PDF to the Trello card and verify the attachment.
 
@@ -70,13 +71,21 @@ uv run python -m unittest discover -s tests -v
 
 The initialization preserves an existing `~/.codex/jd2cv/demanded-skills.json` when updating JD2CV.
 
-Replace the instructional content in both Markdown files under `assets/en/` and `assets/es/` with the candidate's real facts. Then recreate both base PDFs using the commands under **Rendering the Sample PDFs**. Trello setup remains optional and is covered under **Optional Trello Integration**.
+Replace the instructional content in both Markdown files under `assets/en/` and `assets/es/` with the candidate's real facts. Then recreate both base PDFs using the commands under **Rendering the Sample PDFs** and synchronize the known-skills dataset in Codex:
+
+```text
+$jd2cv Sync known skills from the English and Spanish CV templates.
+```
+
+Review and confirm the proposed bilingual mappings before JD2CV writes the JSON. Repeat the synchronization whenever either template's skills change. Trello setup remains optional and is covered under **Optional Trello Integration**.
 
 JD2CV becomes available on the next Codex turn. If it does not appear, restart Codex and invoke it with `$jd2cv` and a job posting URL. See the [official OpenAI skill documentation](https://learn.chatgpt.com/docs/build-skills) for skill discovery and installation behavior.
 
 ## Demanded Skills Tracking
 
 JD2CV records skills explicitly requested by confirmed job postings in `~/.codex/jd2cv/demanded-skills.json`. Each entry contains the canonical bilingual skill name, the number of distinct positions that demand it, the corresponding `COMPANY - POSITION` labels, and a `Known` or `Unknown` status.
+
+The `$jd2cv Sync known skills from the English and Spanish CV templates.` command merges actual skills from both templates into the dataset as `Known`. It ignores instructional examples, preserves existing demand history, upgrades matched `Unknown` skills to `Known`, and asks for confirmation before writing. Skills missing from a template remain unchanged.
 
 Skills already marked `Known` are available for tailoring proposals. When a posting introduces a new skill or requests one previously marked `Unknown`, JD2CV asks whether the candidate possesses it. Confirmed skills become `Known` and are proposed for the current CV and both language templates. Skills the candidate does not possess remain `Unknown` while still contributing market-demand data.
 
