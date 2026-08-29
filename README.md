@@ -10,6 +10,7 @@ It helps an agent:
 - Optionally create a Trello application card in the board's `CV` list through JD2CV's custom Trello API helper.
 - Select the English or Spanish ATS CV template.
 - Propose CV tailoring decisions before editing.
+- Track skills demanded across job postings and classify them as known or unknown to the candidate.
 - Generate review PDFs and a final text-based, single-column ATS PDF.
 - Optionally upload the final PDF to the Trello card and verify the attachment.
 
@@ -18,6 +19,7 @@ It helps an agent:
 - `SKILL.md`: Codex skill instructions.
 - `assets/en/`: English Markdown CV and its rendered PDF.
 - `assets/es/`: Spanish Markdown CV and its rendered PDF.
+- `assets/demanded-skills.template.json`: Blank schema for the user's demanded-skills dataset.
 - `scripts/generate_ats_cv.py`: Shared metadata-aware Markdown-to-PDF generator.
 - `scripts/render_cv.sh`: Helper that runs the PDF generator through the locked `uv` environment.
 - `scripts/trello_job_card.py`: Optional Trello card and CV upload helper that uses the Trello REST API.
@@ -35,6 +37,14 @@ It helps an agent:
 No Trello setup is required for local-only CV generation.
 
 No extra Python package is required for the Trello helper; it uses the Python standard library.
+
+## Demanded Skills Tracking
+
+JD2CV records skills explicitly requested by confirmed job postings in `~/.codex/jd2cv/demanded-skills.json`. Each entry contains the canonical bilingual skill name, the number of distinct positions that demand it, the corresponding `COMPANY - POSITION` labels, and a `Known` or `Unknown` status.
+
+Skills already marked `Known` are available for tailoring proposals. When a posting introduces a new skill or requests one previously marked `Unknown`, JD2CV asks whether the candidate possesses it. Confirmed skills become `Known` and are proposed for the current CV and both language templates. Skills the candidate does not possess remain `Unknown` while still contributing market-demand data.
+
+Position labels are deduplicated before storage, and each skill's demand count always equals its number of recorded positions. The repository keeps the empty schema in `assets/demanded-skills.template.json`; the populated file remains outside the repository.
 
 ## Job URL And Image Handling
 
